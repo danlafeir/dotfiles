@@ -1,0 +1,25 @@
+[user]
+	email = <email>
+	name = <name>
+[format]
+	pretty = format:'%Cred%h%Creset -%Cblue%an%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset'
+[alias]
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  s = status
+  co = checkout
+  b = branch
+  pr = "pull --rebase"
+  c = commit
+  fullhashlog = "log --graph --abbrev-commit '--format=format:%H %C(yellow)%ci%Creset %Cgreen%an%Creset | %s'"
+  w = whatchanged
+  unpushed = !"PROJ_BRANCH=$(git symbolic-ref HEAD | sed 's|refs/heads/||') && git log origin/$PROJ_BRANCH..HEAD"
+  can = commit --amend --no-edit
+[push]
+  default = simple
+[color]
+  ui = auto
+  pager = true
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan

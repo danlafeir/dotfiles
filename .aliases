@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+alias vim="vim"
+alias b="bundle exec"
+alias py="python3"
+alias check_dir_size="du -hs /"

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+function update_git_repos() {
+  STARTING_DIRECTORY=$(pwd)]
+  echo "\nPulling in latest changes for all repositories..."
+
+  for i in $(find . -name ".git" | cut -c 3-); do
+        echo "";
+        echo "\033[32m"+$i+"\033[0m";
+
+        cd "$i";
+        cd ..;
+
+        git config credential.helper store
+        git stash
+        git pull origin master --rebase
+        git stash pop
+        cd $STARTING_DIRECTORY
+  done
+  echo "\n\033[32mComplete!\033[0m\n"
+}
+

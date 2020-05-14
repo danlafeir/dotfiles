@@ -1,0 +1,10 @@
+brew "awscli"
+brew "kubernetes-cli"
+brew "terraform"
+brew "vault"
+cask "aws-vault"
+brew "docker"
+brew "circleci"
+brew "istioctl"
+brew "stern"
+
