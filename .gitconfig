@@ -1,10 +1,9 @@
 [user]
-	email = <email>
-	name = <name>
-[format]
-	pretty = format:'%Cred%h%Creset -%Cblue%an%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset'
+	email = danlafeir@users.noreply.github.com
+	name = Dan Lafeir
+	signingkey = 7824A405173EA5FF
 [alias]
-  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
   s = status
   co = checkout
   b = branch
@@ -23,3 +22,7 @@
   added = yellow
   changed = green
   untracked = cyan
+[commit]
+	gpgsign = true
+[gpg]
+	program = gpg2
