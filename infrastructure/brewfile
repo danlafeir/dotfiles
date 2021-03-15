@@ -7,4 +7,4 @@ brew "docker"
 brew "circleci"
 brew "istioctl"
 brew "stern"
-
+brew "infracost"
