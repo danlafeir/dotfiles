@@ -14,4 +14,9 @@ for file in ~/.{functions,aliases,zshconfig}; do
 done;
 unset file;
 
+if [ -z SSH_AGENT_PID ] then
+	eval "$(ssh-agent -s)" >> SSH_AGENT_PID
+	ssh-add -K ~/.ssh/id_ed25519_github
+fi
+
 PS1="%F{blue}%B%n%b%f:%F{yellow}%1/%f$ "
