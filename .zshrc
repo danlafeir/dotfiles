@@ -16,7 +16,7 @@ unset file;
 
 if [ -z $SSH_AGENT_PID ] 
 then
-	eval "$(ssh-agent -s -t 1000)" >> SSH_AGENT_PID
+	eval "$(ssh-agent -s -t 1000)"
 fi
 
 PS1="%F{blue}%B%n%b%f:%F{yellow}%1/%f$ "
