@@ -4,3 +4,4 @@ then
 fi
 
 cp .aliases .functions .gitconfig .gitignore .zshconfig .zshrc ~/.
+cp .ssh_config ~/.ssh/config
