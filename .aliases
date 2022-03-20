@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
+alias python="python3"
 alias check_dir_size="du -hs /"

@@ -1,1 +1,4 @@
 brew "gpg2"
+cask "google-chrome"
+cask "firefox"
+
