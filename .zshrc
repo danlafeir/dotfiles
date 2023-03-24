@@ -6,8 +6,6 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
-export EDITOR=vim
-export LESS=-RX
 
 for file in ~/.{functions,aliases,zshconfig}; do
 	[ -r "$file" ] && [ -f "$file" ] && source "$file";
