@@ -1,7 +1,7 @@
 [user]
 	email = danlafeir@users.noreply.github.com
 	name = Dan Lafeir
-	signingkey = 7824A405173EA5FF
+	signingkey = A0197D59CD49AE79
 [alias]
   l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
   s = status
