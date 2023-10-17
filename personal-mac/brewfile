@@ -1,7 +1,8 @@
-brew "gpg2"
+brew "gnupg"
+brew "nvim"
+
 cask "google-chrome"
 cask "firefox"
 cask "keybase"
-cask "slack"
-cask "zoom"
-cask "microsoft-teams"
+cask "discord"
+cask "visual-studio-code"
