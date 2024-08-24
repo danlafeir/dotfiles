@@ -11,5 +11,5 @@ else
   brew upgrade
 fi
 
-cp .aliases .functions .gitconfig .gitignore .zshconfig .zshrc .vimrc ~/.
+cp .aliases .functions .gitconfig .gitignore .zshconfig .zshrc .vimrc .tmux.conf ~/.
 cp .ssh_config ~/.ssh/config

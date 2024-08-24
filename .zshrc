@@ -16,5 +16,7 @@ if [ -z $SSH_AGENT_PID ]
 then
 	eval "$(ssh-agent -s)" >> /dev/null
 fi
+export GPG_TTY=$(tty)
 
-PS1="%F{blue}%B%n%b%f:%F{yellow}%1/%f$ "
+# https://zsh.sourceforge.io/doc/release/prompt-expansion.html
+export PS1='%! %F{cyan}%n%f%F{magenta}@%f%F{magenta}%m%f:%F{yellow}%~/%f$ '

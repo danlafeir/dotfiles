@@ -1,8 +1,7 @@
-brew "gnupg"
+brew "pinentry-mac"
 brew "nvim"
+brew "tmux"
 
-cask "google-chrome"
 cask "firefox"
 cask "keybase"
-cask "discord"
 cask "visual-studio-code"
