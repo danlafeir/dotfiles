@@ -19,7 +19,7 @@ fi
 export GPG_TTY=$(tty)
 
 # https://zsh.sourceforge.io/doc/release/prompt-expansion.html
-export PS1='%! %F{cyan}%n%f%F{magenta}@%f%F{magenta}%m%f:%F{yellow}%~/%f$ '
+export PS1='%F{cyan}%n%f%F{magenta}@%f%F{magenta}%m%f:%F{yellow}%~/%f$ '
 
 # Rancher config
 export PATH="$HOME/.rd/bin:$PATH"
