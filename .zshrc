@@ -20,6 +20,13 @@ export GPG_TTY=$(tty)
 
 # https://zsh.sourceforge.io/doc/release/prompt-expansion.html
 export PS1='%F{cyan}%n%f%F{magenta}@%f%F{magenta}%m%f:%F{yellow}%~/%f$ '
+# Swan Computer terminal
+export PS1='%F{green}:> '
 
 # Rancher config
 export PATH="$HOME/.rd/bin:$PATH"
+
+# python config
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
