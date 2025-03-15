@@ -126,7 +126,7 @@
     },
     "cask": {
       "firefox": {
-        "version": "131.0.3",
+        "version": "132.0.2",
         "options": {
           "full_name": "firefox"
         }
@@ -138,7 +138,7 @@
         }
       },
       "visual-studio-code": {
-        "version": "1.94.2",
+        "version": "1.95.3",
         "options": {
           "full_name": "visual-studio-code"
         }
@@ -148,12 +148,12 @@
   "system": {
     "macos": {
       "sequoia": {
-        "HOMEBREW_VERSION": "4.4.3",
+        "HOMEBREW_VERSION": "4.4.6",
         "HOMEBREW_PREFIX": "/opt/homebrew",
         "Homebrew/homebrew-core": "api",
-        "CLT": "16.0.0.0.1.1724870825",
-        "Xcode": "16.0",
-        "macOS": "15.0.1"
+        "CLT": "16.1.0.0.1.1729049160",
+        "Xcode": "16.1",
+        "macOS": "15.1"
       }
     }
   }

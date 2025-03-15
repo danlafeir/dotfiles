@@ -20,3 +20,25 @@ function update-git-repos() {
   echo "\n\033[32mComplete!\033[0m\n"
 }
 
+function is_there_uncommited_changes() {
+	any_changes=$(git ls-files -m 2> /dev/null)
+  if [[ $any_changes == "" ]]; then
+    echo ""
+  else
+		echo "*"
+	fi
+}
+
+function git_branch_name(){
+  branch=$(git symbolic-ref HEAD 2> /dev/null | awk 'BEGIN{FS="/"} {print $NF}')
+  if [[ $branch == "" ]];
+  then
+    :
+  else
+		echo '['$branch']'$(is_there_uncommited_changes)
+  fi
+}
+
+function custom_ps1() {
+  echo '%F{cyan}%n%f%F{magenta}@%f%F{magenta}%m%f:%F{yellow}%~/%f%F{green}$(git_branch_name)%f$ '
+}
