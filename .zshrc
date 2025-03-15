@@ -21,7 +21,7 @@ fi
 export GPG_TTY=$(tty)
 
 # https://zsh.sourceforge.io/doc/release/prompt-expansion.html
-export PS1=$(custom_ps1)
+export PS1=$BASIC_TERMINAL
 
 # Rancher config
 export PATH="$HOME/.rd/bin:$PATH"
