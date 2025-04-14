@@ -9,7 +9,7 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-for file in ~/.{functions,aliases,zshconfig}; do
+for file in ~/.{functions,aliases,zshconfig,machine_specific_config}; do
 	[ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
