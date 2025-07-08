@@ -11,5 +11,11 @@ else
   brew upgrade
 fi
 
+
+if [ ! -d "$HOME/.config/nvim" ] 
+then
+  sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+fi
 cp .aliases .functions .gitconfig .gitignore .zshconfig .zshrc .vimrc .tmux.conf ~/.
 cp .ssh_config ~/.ssh/config
