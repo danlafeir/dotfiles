@@ -1,5 +1,9 @@
 #!/usr/bin/env zsh
 
+function printHello() {
+  echo "Hello"
+}
+
 export PATH=$HOME/go/bin/:$PATH
 
 export ZSH="$HOME/.oh-my-zsh"
