@@ -18,4 +18,5 @@ then
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 fi
 cp .aliases .functions .gitconfig .gitignore .zshconfig .zshrc .vimrc .tmux.conf ~/.
+cp .gpg-agent.conf ~/.gnupg/gpg-agent.conf
 cp .ssh_config ~/.ssh/config
