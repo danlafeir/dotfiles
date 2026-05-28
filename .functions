@@ -11,9 +11,8 @@ function update-git-repos() {
         cd "$i";
         cd ..;
 
-        git config credential.helper store
         git stash
-        git pull origin master --rebase
+        git pull --rebase
         git stash pop
         cd $STARTING_DIRECTORY
   done
