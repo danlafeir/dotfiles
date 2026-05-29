@@ -9,6 +9,7 @@ Project-specific CLAUDE.md files layer additional rules on top of these.
 - Keep commits small and focused — one logical unit per commit
 - Write commit messages that explain why, not what
 - Never batch unrelated changes into one commit
+- If a change is guarded by passing tests or is pure refactor, commit without asking
 
 ## When to proceed vs pause for review
 
@@ -25,7 +26,7 @@ Pause and confirm before proceeding:
 - Security-sensitive changes: auth, permissions, secrets, tokens
 - Infrastructure changes that affect live systems
 - Public API or interface changes that affect callers
-- Unfamiliar territory: new framework, new domain, new external dependency
+- Low confidence the solution matches the intent — check in with the user to validate current thinking before proceeding
 
 ## Tests
 
@@ -38,5 +39,5 @@ Pause and confirm before proceeding:
 - No comments unless the WHY is non-obvious
 - No error handling for impossible cases; trust internal guarantees
 - No premature abstractions — three similar lines is better than a helper
-- Prefer editing existing files to creating new ones
+- Prefer editing existing files and suggest refactoring in a separate commit to evolve the code architecture
 - No half-finished implementations or backwards-compatibility shims for removed code

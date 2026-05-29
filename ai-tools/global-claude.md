@@ -22,11 +22,16 @@ Pause and confirm before proceeding:
 - Security-sensitive changes: auth, permissions, secrets, tokens
 - Infrastructure changes that affect live systems
 - Public API or interface changes that affect callers
-- Unfamiliar territory: new framework, new domain, new external dependency
+- Low confidence the solution matches the intent — check in with the user to validate current thinking before proceeding
+
+## Tests
+- Use test failures to signal broken interfaces — if tests break, confirm the change is intentional before proceeding
+- Flag when test files are becoming hard to maintain or mock-heavy; this signals a need to revisit the architecture, not add more mocks
+- Integration tests should hit real infrastructure where possible — mock/prod divergence masks real failures
 
 ## Code style
 - No comments unless the WHY is non-obvious — a hidden constraint, a workaround, a subtle invariant
 - No error handling for impossible cases; trust internal guarantees
 - No premature abstractions — three similar lines is better than a helper
-- Prefer editing existing files to creating new ones
+- Prefer editing existing files and suggest refactoring in a separate commit to evolve the code architecture
 - No half-finished implementations; no backwards-compatibility shims for removed code
