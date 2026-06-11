@@ -14,7 +14,7 @@ brew upgrade
 brew bundle --file "$DOTFILES_DIR/personal-mac/brewfile"
 $PERSONAL && brew bundle --file "$DOTFILES_DIR/personal-mac/brewfile.personal"
 
-ln -sf "$DOTFILES_DIR/.vim" "$HOME/.vim"
+ln -sfn "$DOTFILES_DIR/.vim" "$HOME/.vim"
 mkdir -p "$DOTFILES_DIR/.vim/undodir"
 for file in .aliases .functions .gitconfig .gitignore .zshconfig .zshrc .vimrc .tmux.conf; do
   ln -sf "$DOTFILES_DIR/$file" "$HOME/$file"

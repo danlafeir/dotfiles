@@ -3,3 +3,5 @@
 out
 bin
 .vim/undodir
+.vim/plugged/
+.vim/.vim
