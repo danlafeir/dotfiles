@@ -1,7 +1,6 @@
 [user]
 	email = danlafeir@users.noreply.github.com
 	name = Dan Lafeir
-	signingkey = A0197D59CD49AE79
 [alias]
   l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
   s = status
@@ -26,3 +25,5 @@
 	gpgsign = true
 [gpg]
 	program = gpg
+[include]
+	path = ~/.gitconfig.local
