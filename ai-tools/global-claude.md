@@ -29,6 +29,10 @@ Pause and confirm before proceeding:
 - Flag when test files are becoming hard to maintain or mock-heavy; this signals a need to revisit the architecture, not add more mocks
 - Integration tests should hit real infrastructure where possible — mock/prod divergence masks real failures
 
+## Documentation
+- When changing behavior, update any documentation that describes it — inline docs, READMEs, and API references are part of the change, not a follow-up
+- If no documentation exists for a changed system, flag it
+
 ## Code style
 - No comments unless the WHY is non-obvious — a hidden constraint, a workaround, a subtle invariant
 - No error handling for impossible cases; trust internal guarantees

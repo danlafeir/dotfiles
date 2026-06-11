@@ -19,6 +19,10 @@
 - Pause before modifying pipeline steps that gate deployments
 - Secret references must use the existing secret management pattern — never hardcode
 
+## Documentation
+- Runbooks and architecture diagrams must be updated when topology or operational procedures change
+- New resources should be documented with their purpose and any non-obvious configuration
+
 ## Pause triggers (in addition to global)
 - Any change touching prod namespaces / workspaces
 - IAM / RBAC / security group modifications

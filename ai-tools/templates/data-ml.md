@@ -22,6 +22,10 @@
 - Unit test data transformations with known inputs and outputs
 - Flag when a test requires a full dataset — suggest a fixture or sample instead
 
+## Documentation
+- Data dictionaries and schema docs must be updated when pipeline inputs or outputs change
+- Experiments should be logged with their config, results, and conclusion — not just the winning run
+
 ## Pause triggers (in addition to global)
 - Output schema changes
 - Model architecture or training config changes

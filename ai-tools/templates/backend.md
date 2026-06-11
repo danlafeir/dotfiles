@@ -18,6 +18,10 @@
 - Integration tests should hit real infrastructure (DB, queue) — not mocks
 - Unit test pure logic; integration test boundaries
 
+## Documentation
+- Update API docs and endpoint references when request/response shapes change
+- Migration files should include a comment explaining why the schema change is needed
+
 ## Pause triggers (in addition to global)
 - Any change to auth, session, or token handling
 - Schema changes to existing tables

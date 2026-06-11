@@ -23,6 +23,10 @@
 - Test the public interface, not internals
 - CLI tests should invoke the binary/entry point, not internal functions
 
+## Documentation
+- Update the README, man page, or help text whenever a command, flag, or output format changes
+- Changelog entries are part of the change for anything that affects callers
+
 ## Pause triggers (in addition to global)
 - Any breaking change to the public API or CLI interface
 - New required dependencies

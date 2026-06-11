@@ -20,6 +20,10 @@
 - Test behavior from the user's perspective, not implementation details
 - Avoid testing internal component state directly
 
+## Documentation
+- Update component documentation and usage examples when props or behavior change
+- User-facing flow changes should be reflected in any onboarding or help documentation
+
 ## Pause triggers (in addition to global)
 - New user-facing flows or pages
 - Changes to routing structure
