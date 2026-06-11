@@ -30,20 +30,21 @@ ln -sf "$HOME/.vim/autoload/plug.vim" "$NVIM_PLUG"
 # Install all vim/neovim plugins
 vim +PlugInstall +qall
 nvim +PlugInstall +qall
-GPG_KEYS=($(gpg --list-secret-keys --keyid-format LONG 2>/dev/null | grep '^sec' | awk '{print $2}' | cut -d'/' -f2))
-if [ ${#GPG_KEYS[@]} -eq 1 ]; then
-  GPG_KEY="${GPG_KEYS[0]}"
-elif [ ${#GPG_KEYS[@]} -gt 1 ]; then
-  echo "Multiple GPG keys found. Select one to use for git signing:"
-  for i in "${!GPG_KEYS[@]}"; do
-    UID_LINE=$(gpg --list-secret-keys --keyid-format LONG "${GPG_KEYS[$i]}" 2>/dev/null | grep '^uid' | head -1 | sed 's/^uid *\[[^]]*\] *//')
-    printf "  %d) %s  %s\n" "$((i+1))" "${GPG_KEYS[$i]}" "$UID_LINE"
-  done
-  read -rp "Enter number (or press Enter to skip): " CHOICE
-  [[ "$CHOICE" =~ ^[0-9]+$ ]] && GPG_KEY="${GPG_KEYS[$((CHOICE-1))]}"
-fi
-if [ -n "$GPG_KEY" ]; then
-  printf '[user]\n\tsigningkey = %s\n' "$GPG_KEY" > ~/.gitconfig.local
+CURRENT_KEY=$(git config --file ~/.gitconfig.local user.signingkey 2>/dev/null)
+if [ -z "$CURRENT_KEY" ]; then
+  GPG_KEYS=($(gpg --list-secret-keys --keyid-format LONG 2>/dev/null | grep '^sec' | awk '{print $2}' | cut -d'/' -f2))
+  if [ ${#GPG_KEYS[@]} -eq 1 ]; then
+    GPG_KEY="${GPG_KEYS[0]}"
+  elif [ ${#GPG_KEYS[@]} -gt 1 ]; then
+    echo "Multiple GPG keys found. Select one to use for git signing:"
+    for i in "${!GPG_KEYS[@]}"; do
+      UID_LINE=$(gpg --list-secret-keys --keyid-format LONG "${GPG_KEYS[$i]}" 2>/dev/null | grep '^uid' | head -1 | sed 's/^uid *\[[^]]*\] *//')
+      printf "  %d) %s  %s\n" "$((i+1))" "${GPG_KEYS[$i]}" "$UID_LINE"
+    done
+    read -rp "Enter number (or press Enter to skip): " CHOICE
+    [[ "$CHOICE" =~ ^[0-9]+$ ]] && GPG_KEY="${GPG_KEYS[$((CHOICE-1))]}"
+  fi
+  [ -n "$GPG_KEY" ] && git config --file ~/.gitconfig.local user.signingkey "$GPG_KEY"
 fi
 
 mkdir -p ~/.claude && ln -sf "$DOTFILES_DIR/ai-tools/global-claude.md" "$HOME/.claude/CLAUDE.md"
