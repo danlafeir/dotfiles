@@ -10,13 +10,6 @@ if [[ $? != 0 ]] ; then
 fi
 brew upgrade
 
-# Install vim-plug for neovim
-NVIM_PLUG="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim"
-if [ ! -f "$NVIM_PLUG" ]; then
-  curl -fLo "$NVIM_PLUG" --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-fi
-
 ln -sf "$DOTFILES_DIR/.vim" "$HOME/.vim"
 mkdir -p "$DOTFILES_DIR/.vim/undodir"
 for file in .aliases .functions .gitconfig .gitignore .zshconfig .zshrc .vimrc .tmux.conf; do
@@ -24,6 +17,15 @@ for file in .aliases .functions .gitconfig .gitignore .zshconfig .zshrc .vimrc .
 done
 
 mkdir -p ~/.config/nvim && ln -sf "$DOTFILES_DIR/.vimrc" "$HOME/.config/nvim/init.vim"
+
+# Install vim-plug for neovim, reusing the bundled plug.vim from .vim/autoload
+NVIM_PLUG="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim"
+mkdir -p "$(dirname "$NVIM_PLUG")"
+ln -sf "$HOME/.vim/autoload/plug.vim" "$NVIM_PLUG"
+
+# Install all vim/neovim plugins
+vim +PlugInstall +qall
+nvim +PlugInstall +qall
 mkdir -p ~/.claude && ln -sf "$DOTFILES_DIR/ai-tools/global-claude.md" "$HOME/.claude/CLAUDE.md"
 ln -sf "$DOTFILES_DIR/AGENTS.md" "$HOME/AGENTS.md"
 mkdir -p ~/.gnupg && ln -sf "$DOTFILES_DIR/.gpg-agent.conf" "$HOME/.gnupg/gpg-agent.conf"
