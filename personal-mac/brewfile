@@ -1,3 +1,4 @@
 brew "pinentry-mac"
+brew "vim"
 brew "nvim"
 brew "tmux"
