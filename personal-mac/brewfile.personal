@@ -1,0 +1,3 @@
+cask "firefox"
+cask "keybase"
+cask "visual-studio-code"

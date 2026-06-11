@@ -1,7 +1,3 @@
 brew "pinentry-mac"
 brew "nvim"
 brew "tmux"
-
-cask "firefox"
-cask "keybase"
-cask "visual-studio-code"

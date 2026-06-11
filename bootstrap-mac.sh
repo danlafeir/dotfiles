@@ -1,4 +1,6 @@
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+PERSONAL=false
+[[ "$1" == "personal" ]] && PERSONAL=true
 
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -10,6 +12,7 @@ if [[ $? != 0 ]] ; then
 fi
 brew upgrade
 brew bundle --file "$DOTFILES_DIR/personal-mac/brewfile"
+$PERSONAL && brew bundle --file "$DOTFILES_DIR/personal-mac/brewfile.personal"
 
 ln -sf "$DOTFILES_DIR/.vim" "$HOME/.vim"
 mkdir -p "$DOTFILES_DIR/.vim/undodir"
