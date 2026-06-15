@@ -7,6 +7,10 @@
 - Never batch unrelated changes into one commit
 - If a change is guarded by passing tests or is pure refactor, commit without asking
 
+## Branching and pushing
+- Commit directly to `main` and push — do not create feature branches, and do not wait for a merge / "fast-forward and push" gate. (Exception: if `main` is protected or the repo uses a PR workflow, open a pull request instead.)
+- Keep `main` green: run the tests before pushing, since there is no feature-branch buffer.
+
 ## When to proceed vs pause for review
 
 Proceed autonomously:
