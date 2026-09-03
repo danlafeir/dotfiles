@@ -52,6 +52,7 @@ For anything touching auth, identity, access control, permissions, secrets, or t
 ## Documentation
 - When changing behavior, update any documentation that describes it — inline docs, READMEs, and API references are part of the change, not a follow-up
 - If no documentation exists for a changed system, flag it
+- For changes to a public interface, run the `document-changes` skill (spins up the `documentation-agent` subagent) before considering the work done — it proposes README/docs/API-spec updates and always confirms with you before writing, so docs stay current without piling up
 
 ## Code style
 - No comments unless the WHY is non-obvious — a hidden constraint, a workaround, a subtle invariant

@@ -50,6 +50,12 @@ fi
 mkdir -p ~/.claude && ln -sf "$DOTFILES_DIR/ai-tools/global-claude.md" "$HOME/.claude/CLAUDE.md"
 ln -sf "$DOTFILES_DIR/AGENTS.md" "$HOME/AGENTS.md"
 
+mkdir -p ~/.claude/agents
+ln -sf "$DOTFILES_DIR/ai-tools/agents/documentation-agent.md" "$HOME/.claude/agents/documentation-agent.md"
+
+mkdir -p ~/.claude/skills
+ln -sfn "$DOTFILES_DIR/ai-tools/skills/document-changes" "$HOME/.claude/skills/document-changes"
+
 mkdir -p ~/.claude/hooks
 ln -sf "$DOTFILES_DIR/ai-tools/hooks/secret-store-guard.sh" "$HOME/.claude/hooks/secret-store-guard.sh"
 
