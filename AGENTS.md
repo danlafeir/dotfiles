@@ -18,6 +18,8 @@ Project-specific CLAUDE.md files layer additional rules on top of these.
 
 ## When to proceed vs pause for review
 
+Ask questions proactively, not only when blocked — spot-check understanding before starting ambiguous work and at logical milestones, even when you could technically proceed without asking.
+
 Proceed autonomously:
 - Refactoring covered by existing tests
 - Boilerplate, scaffolding, generated code
@@ -28,10 +30,17 @@ Proceed autonomously:
 Pause and confirm before proceeding:
 - Net-new user-defined logic: new features, new algorithms, new data models
 - Destructive or irreversible operations: deletions, migrations, force pushes
-- Security-sensitive changes: auth, permissions, secrets, tokens
+- Security-sensitive changes: auth, identity, access control, permissions, secrets, tokens
 - Infrastructure changes that affect live systems
 - Public API or interface changes that affect callers
 - Low confidence the solution matches the intent — check in with the user to validate current thinking before proceeding
+
+### Security-sensitive changes get extra scrutiny
+
+For anything touching auth, identity, access control, permissions, secrets, or tokens:
+- Before implementing: ask targeted questions about the intended access model and scope — who/what should have access, to what, and for how long — don't infer this from context alone
+- After implementing: don't just summarize — ask specific questions that force active confirmation of each significant decision, e.g. "this grants X role Y permission on Z, scoped to W — confirm this matches intent and isn't broader than needed"
+- Run the `security-review` skill on the change before considering it done
 
 ## Secrets and credentials
 
