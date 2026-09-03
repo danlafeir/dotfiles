@@ -49,5 +49,23 @@ fi
 
 mkdir -p ~/.claude && ln -sf "$DOTFILES_DIR/ai-tools/global-claude.md" "$HOME/.claude/CLAUDE.md"
 ln -sf "$DOTFILES_DIR/AGENTS.md" "$HOME/AGENTS.md"
+
+mkdir -p ~/.claude/hooks
+ln -sf "$DOTFILES_DIR/ai-tools/hooks/secret-store-guard.sh" "$HOME/.claude/hooks/secret-store-guard.sh"
+
+CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+HOOK_SCRIPT="$HOME/.claude/hooks/secret-store-guard.sh"
+NEW_HOOKS=$(jq --arg script "$HOOK_SCRIPT" \
+  '.PreToolUse[].hooks[].command = $script' \
+  "$DOTFILES_DIR/ai-tools/hooks/settings-hooks.json")
+
+if [ -f "$CLAUDE_SETTINGS" ]; then
+  cp "$CLAUDE_SETTINGS" "$CLAUDE_SETTINGS.bak"
+  jq --argjson hooks "$NEW_HOOKS" '.hooks = $hooks' "$CLAUDE_SETTINGS" > "$CLAUDE_SETTINGS.tmp" \
+    && mv "$CLAUDE_SETTINGS.tmp" "$CLAUDE_SETTINGS"
+else
+  jq -n --argjson hooks "$NEW_HOOKS" '{hooks: $hooks}' > "$CLAUDE_SETTINGS"
+fi
+
 mkdir -p ~/.gnupg && ln -sf "$DOTFILES_DIR/.gpg-agent.conf" "$HOME/.gnupg/gpg-agent.conf"
 mkdir -p ~/.ssh && ln -sf "$DOTFILES_DIR/.ssh_config" "$HOME/.ssh/config"

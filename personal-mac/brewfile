@@ -1,3 +1,4 @@
+brew "jq"
 brew "pinentry-mac"
 brew "python@3"
 brew "vim"
