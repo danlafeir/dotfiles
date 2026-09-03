@@ -1,0 +1,16 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        { "type": "command", "command": "" }
+      ]
+    },
+    {
+      "matcher": "Read|Edit|Write",
+      "hooks": [
+        { "type": "command", "command": "" }
+      ]
+    }
+  ]
+}
