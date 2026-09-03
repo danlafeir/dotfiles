@@ -33,6 +33,15 @@ Pause and confirm before proceeding:
 - Public API or interface changes that affect callers
 - Low confidence the solution matches the intent — check in with the user to validate current thinking before proceeding
 
+## Secrets and credentials
+
+- Never read or write real secret values directly through a secret store: no `op read`/`item get` (1Password), `aws secretsmanager`/`ssm --with-decryption`, `gcloud secrets versions access`, `az keyvault secret show`, `vault kv get`/`read`, macOS Keychain (`security find-*-password -w`), `kubectl get secret -o json/yaml`, `sops -d`, `gpg -d`, or printing real `.env`/credentials files
+- Stop at configuration: only produce or edit references to secrets — env var names, secret-manager resource paths in IaC, `.env.example` entries — never the values themselves
+- After wiring configuration, tell the user the exact manual step needed to populate real values, then stop and wait for confirmation
+- `.env.example`/`.env.sample`/`.env.template`/`.env.dist` and similar placeholder files are ordinary configuration, not secrets — read and edit them freely
+- Once the user confirms manual setup is done, verify the application behaves correctly at runtime (starts, feature works, logs are clean) without inspecting or printing the actual secret value
+- This is enforced by a PreToolUse hook (`ai-tools/hooks/secret-store-guard.sh`) as a backstop — treat a hook block as confirmation the rule applies, not an obstacle to route around
+
 ## Tests
 
 - Use test failures to signal broken interfaces — if tests break, confirm the change is intentional before proceeding
