@@ -3,13 +3,14 @@
     {
       "matcher": "Bash",
       "hooks": [
-        { "type": "command", "command": "" }
+        { "type": "command", "command": "__SECRET_STORE_GUARD__" },
+        { "type": "command", "command": "__PUSH_REVIEW_GATE__" }
       ]
     },
     {
       "matcher": "Read|Edit|Write",
       "hooks": [
-        { "type": "command", "command": "" }
+        { "type": "command", "command": "__SECRET_STORE_GUARD__" }
       ]
     }
   ]

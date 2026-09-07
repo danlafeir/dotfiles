@@ -53,27 +53,46 @@ ln -sf "$DOTFILES_DIR/AGENTS.md" "$HOME/AGENTS.md"
 mkdir -p ~/.claude/agents
 ln -sf "$DOTFILES_DIR/ai-tools/agents/documentation-agent.md" "$HOME/.claude/agents/documentation-agent.md"
 ln -sf "$DOTFILES_DIR/ai-tools/agents/pre-push-audit-agent.md" "$HOME/.claude/agents/pre-push-audit-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/agents/security-review-agent.md" "$HOME/.claude/agents/security-review-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/agents/performance-review-agent.md" "$HOME/.claude/agents/performance-review-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/agents/db-integrity-agent.md" "$HOME/.claude/agents/db-integrity-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/agents/design-review-agent.md" "$HOME/.claude/agents/design-review-agent.md"
 
 mkdir -p ~/.claude/skills
 ln -sfn "$DOTFILES_DIR/ai-tools/skills/document-changes" "$HOME/.claude/skills/document-changes"
 ln -sfn "$DOTFILES_DIR/ai-tools/skills/pre-push-audit" "$HOME/.claude/skills/pre-push-audit"
+ln -sfn "$DOTFILES_DIR/ai-tools/skills/pre-push-review" "$HOME/.claude/skills/pre-push-review"
 
 mkdir -p ~/.claude/hooks
 ln -sf "$DOTFILES_DIR/ai-tools/hooks/secret-store-guard.sh" "$HOME/.claude/hooks/secret-store-guard.sh"
+ln -sf "$DOTFILES_DIR/ai-tools/hooks/push-review-gate.sh" "$HOME/.claude/hooks/push-review-gate.sh"
+ln -sf "$DOTFILES_DIR/ai-tools/hooks/push-review-pretooluse.sh" "$HOME/.claude/hooks/push-review-pretooluse.sh"
+ln -sf "$DOTFILES_DIR/ai-tools/git-hooks/pre-push" "$HOME/.claude/hooks/push-review-git-pre-push.sh"
+ln -sf "$DOTFILES_DIR/ai-tools/git-hooks/install.sh" "$HOME/.claude/hooks/push-review-install-hook.sh"
 
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
-HOOK_SCRIPT="$HOME/.claude/hooks/secret-store-guard.sh"
-NEW_HOOKS=$(jq --arg script "$HOOK_SCRIPT" \
-  '.PreToolUse[].hooks[].command = $script' \
+NEW_HOOKS=$(sed \
+  -e "s#__SECRET_STORE_GUARD__#$HOME/.claude/hooks/secret-store-guard.sh#g" \
+  -e "s#__PUSH_REVIEW_GATE__#$HOME/.claude/hooks/push-review-pretooluse.sh#g" \
   "$DOTFILES_DIR/ai-tools/hooks/settings-hooks.json")
 
 if [ -f "$CLAUDE_SETTINGS" ]; then
   cp "$CLAUDE_SETTINGS" "$CLAUDE_SETTINGS.bak"
-  jq --argjson hooks "$NEW_HOOKS" '.hooks = $hooks' "$CLAUDE_SETTINGS" > "$CLAUDE_SETTINGS.tmp" \
+  # Merge only the PreToolUse key this template owns — overwriting the whole
+  # .hooks object would silently drop any other hook type already
+  # configured there (e.g. a SessionStart hook set up some other way).
+  jq --argjson hooks "$NEW_HOOKS" '.hooks.PreToolUse = $hooks.PreToolUse' "$CLAUDE_SETTINGS" > "$CLAUDE_SETTINGS.tmp" \
     && mv "$CLAUDE_SETTINGS.tmp" "$CLAUDE_SETTINGS"
 else
   jq -n --argjson hooks "$NEW_HOOKS" '{hooks: $hooks}' > "$CLAUDE_SETTINGS"
 fi
+
+# Push-review git-level gate is per-repo opt-in, not global: a global
+# `core.hooksPath` override would redirect hook lookup for every hook type,
+# not just pre-push, silently breaking any repo-local hook (e.g. the
+# `pre-commit` framework's directly-installed .git/hooks/pre-commit) that
+# doesn't set its own core.hooksPath. Run
+# `~/.claude/hooks/push-review-install-hook.sh` once in a repo to opt it in.
 
 mkdir -p ~/.gnupg && ln -sf "$DOTFILES_DIR/.gpg-agent.conf" "$HOME/.gnupg/gpg-agent.conf"
 mkdir -p ~/.ssh && ln -sf "$DOTFILES_DIR/.ssh_config" "$HOME/.ssh/config"

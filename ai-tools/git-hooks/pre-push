@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Per-repo pre-push hook for the push-review gate. Not installed globally —
+# a global `core.hooksPath` override was considered and rejected: it
+# redirects hook lookup for *every* hook type (pre-commit, commit-msg,
+# etc.), not just pre-push, which would have silently stopped any
+# repo-local hook (e.g. the `pre-commit` Python framework, which writes
+# .git/hooks/pre-commit directly and sets no config key of its own) from
+# firing anywhere on the machine the moment this was installed.
+#
+# Instead, `install.sh` in this directory symlinks this file into a single
+# opted-in repo's .git/hooks/pre-push, chaining to whatever it replaced —
+# zero effect on any repo that hasn't explicitly opted in.
+#
+# Enforcement itself still gates on `git config --bool push-review.enabled`
+# (the same flag install.sh sets and the Claude-Code-side PreToolUse hook
+# checks), so `git config push-review.enabled false` is a quick way to pause
+# it in a given repo without uninstalling.
+#
+# This is a speed bump, not a lock: `git push --no-verify` still bypasses
+# it, same as any git hook.
+
+STDIN_DATA=$(cat)
+REMOTE_NAME="${1:-}"
+REMOTE_URL="${2:-}"
+
+GIT_COMMON_DIR=$(git rev-parse --git-common-dir 2>/dev/null) || exit 0
+ORIGINAL_HOOK="$GIT_COMMON_DIR/hooks/pre-push.pre-push-review-original"
+
+if [ -x "$ORIGINAL_HOOK" ]; then
+  if ! printf '%s' "$STDIN_DATA" | "$ORIGINAL_HOOK" "$REMOTE_NAME" "$REMOTE_URL"; then
+    exit 1
+  fi
+fi
+
+ENABLED=$(git config --bool push-review.enabled 2>/dev/null) || ENABLED=false
+[ "$ENABLED" = "true" ] || exit 0
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+# Absolute, deployed-location reference — this script gets symlinked into
+# some other repo's .git/hooks/, so a path relative to its own location
+# (../hooks/push-review-gate.sh) would no longer resolve to anything.
+GATE_SCRIPT="$HOME/.claude/hooks/push-review-gate.sh"
+
+if [ ! -x "$GATE_SCRIPT" ]; then
+  echo "BLOCKED by pre-push (push-review gate): $GATE_SCRIPT not found or not executable - run bootstrap-mac.sh" >&2
+  exit 1
+fi
+
+if ! REASON=$("$GATE_SCRIPT" check "$REPO_ROOT" 2>&1); then
+  echo "BLOCKED by pre-push (push-review gate): $REASON" >&2
+  echo "Policy: pushing requires a passing /pre-push-review for the current diff. Run Claude Code in this repo, invoke /pre-push-review, address or acknowledge its findings, then push again. (git push --no-verify bypasses this, if you really mean to.)" >&2
+  exit 1
+fi
+
+exit 0
