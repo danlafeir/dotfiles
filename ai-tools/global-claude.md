@@ -67,3 +67,16 @@ For anything touching auth, identity, access control, permissions, secrets, or t
 - No premature abstractions — three similar lines is better than a helper
 - Prefer editing existing files and suggest refactoring in a separate commit to evolve the code architecture
 - No half-finished implementations; no backwards-compatibility shims for removed code
+
+## Design patterns
+- Return errors as values (Result/Either, `[value, error]`, discriminated union) at call boundaries, not exceptions thrown up the stack — reserve throw/panic for states the caller genuinely cannot continue past
+- Guard clauses over nested conditionals — handle the invalid case first and return, don't wrap the happy path in nested if/else
+- Explicit optionality (`T | null` with narrowing, Option/Maybe) over sentinel values (`-1`, `""`, magic strings) to signal "no value"
+- Model mutually exclusive states as one discriminated value/enum, not several independent booleans or nullable fields that can drift out of sync
+- Idempotent, boundedly-retried operations — anything that can be retried (webhook handler, job consumer, network call) should be safe to run twice, with explicit backoff and an attempt cap, not a bare "runs once" assumption or an unbounded retry loop
+- Explicit timeout on every external call (network, DB, subprocess) — don't inherit a client's default, which is often unbounded
+- Composition over inheritance — share behavior by calling small functions/objects; reserve inheritance for genuine is-a relationships with a stable base contract
+- Handle an error once, at the boundary that decides what to do with it (retry, surface, drop) — don't log-and-rethrow at every layer it passes through
+- Keep interfaces narrow — add only the method/field a caller actually needs, rather than growing one shared interface every implementer must satisfy or stub
+- Inject a dependency only at the seam you'd otherwise have to mock (network client, clock, ID generator) instead of reaching for a global/singleton there — don't introduce a DI framework beyond that seam
+- No floating async work — every promise/future is awaited with explicit error handling or detached on purpose with a comment; never left to silently swallow a rejection
