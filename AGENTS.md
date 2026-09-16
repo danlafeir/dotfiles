@@ -19,7 +19,7 @@ Project-specific CLAUDE.md files layer additional rules on top of these.
 ## Pre-push review gate
 
 - Pushing requires a passing `/pre-push-review` for the current diff — it spins up security, performance, database-integrity, and design/correctness review agents and records a pass/fail decision
-- Enforced two ways, both gated on the same per-repo opt-in (`git config push-review.enabled true`): a PreToolUse hook (`ai-tools/hooks/push-review-pretooluse.sh`) blocks `git push` run through Claude Code, and a `pre-push` git hook blocks it for a plain terminal push too
+- Enforced two ways, both gated on the same per-repo opt-in (`git config push-review.enabled true`): a PreToolUse hook (`ai-tools/developer/hooks/push-review-pretooluse.sh`) blocks `git push` run through Claude Code, and a `pre-push` git hook blocks it for a plain terminal push too
 - Opt a repo in once with `~/.claude/hooks/push-review-install-hook.sh` (installs the git hook and sets the config flag) — deliberately per-repo, not a global `core.hooksPath` override, since that would silently stop any repo-local hook (e.g. the `pre-commit` framework) that doesn't set its own `core.hooksPath`
 - Treat a gate block as confirmation the rule applies, not an obstacle to route around: fix the finding (or acknowledge it in `/pre-push-review`) and re-run, rather than pushing around it
 - Not for dependency CVEs/lint findings (that's `pre-push-audit`) or reuse/simplification cleanups (that's the built-in `/code-review`)
@@ -57,7 +57,7 @@ For anything touching auth, identity, access control, permissions, secrets, or t
 - After wiring configuration, tell the user the exact manual step needed to populate real values, then stop and wait for confirmation
 - `.env.example`/`.env.sample`/`.env.template`/`.env.dist` and similar placeholder files are ordinary configuration, not secrets — read and edit them freely
 - Once the user confirms manual setup is done, verify the application behaves correctly at runtime (starts, feature works, logs are clean) without inspecting or printing the actual secret value
-- This is enforced by a PreToolUse hook (`ai-tools/hooks/secret-store-guard.sh`) as a backstop — treat a hook block as confirmation the rule applies, not an obstacle to route around
+- This is enforced by a PreToolUse hook (`ai-tools/all-purpose/hooks/secret-store-guard.sh`) as a backstop — treat a hook block as confirmation the rule applies, not an obstacle to route around
 
 ## Tests
 

@@ -15,7 +15,7 @@ findings and asking the user what to do about them.
 ## The rubric
 
 This is the same standard already agreed for backend projects
-(`ai-tools/templates/backend.md`'s `## Database` section) — apply it, don't
+(`ai-tools/developer/templates/backend.md`'s `## Database` section) — apply it, don't
 invent new rules:
 
 - Every migration needs a considered rollback path (a `down`/`revert`

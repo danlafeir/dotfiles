@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-DOTFILES_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-TEMPLATES_DIR="$DOTFILES_DIR/ai-tools/templates"
+DOTFILES_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+TEMPLATES_DIR="$DOTFILES_DIR/ai-tools/developer/templates"
 AVAILABLE=$(ls "$TEMPLATES_DIR" | sed 's/\.md//' | tr '\n' ' ')
 
 if [ -z "${1:-}" ]; then

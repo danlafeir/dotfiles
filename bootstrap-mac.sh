@@ -47,34 +47,34 @@ if [ -z "$CURRENT_KEY" ]; then
   [ -n "$GPG_KEY" ] && git config --file ~/.gitconfig.local user.signingkey "$GPG_KEY"
 fi
 
-mkdir -p ~/.claude && ln -sf "$DOTFILES_DIR/ai-tools/global-claude.md" "$HOME/.claude/CLAUDE.md"
+mkdir -p ~/.claude && ln -sf "$DOTFILES_DIR/ai-tools/all-purpose/global-claude.md" "$HOME/.claude/CLAUDE.md"
 ln -sf "$DOTFILES_DIR/AGENTS.md" "$HOME/AGENTS.md"
 
 mkdir -p ~/.claude/agents
-ln -sf "$DOTFILES_DIR/ai-tools/agents/documentation-agent.md" "$HOME/.claude/agents/documentation-agent.md"
-ln -sf "$DOTFILES_DIR/ai-tools/agents/pre-push-audit-agent.md" "$HOME/.claude/agents/pre-push-audit-agent.md"
-ln -sf "$DOTFILES_DIR/ai-tools/agents/security-review-agent.md" "$HOME/.claude/agents/security-review-agent.md"
-ln -sf "$DOTFILES_DIR/ai-tools/agents/performance-review-agent.md" "$HOME/.claude/agents/performance-review-agent.md"
-ln -sf "$DOTFILES_DIR/ai-tools/agents/db-integrity-agent.md" "$HOME/.claude/agents/db-integrity-agent.md"
-ln -sf "$DOTFILES_DIR/ai-tools/agents/design-review-agent.md" "$HOME/.claude/agents/design-review-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/agents/documentation-agent.md" "$HOME/.claude/agents/documentation-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/agents/pre-push-audit-agent.md" "$HOME/.claude/agents/pre-push-audit-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/agents/security-review-agent.md" "$HOME/.claude/agents/security-review-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/agents/performance-review-agent.md" "$HOME/.claude/agents/performance-review-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/agents/db-integrity-agent.md" "$HOME/.claude/agents/db-integrity-agent.md"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/agents/design-review-agent.md" "$HOME/.claude/agents/design-review-agent.md"
 
 mkdir -p ~/.claude/skills
-ln -sfn "$DOTFILES_DIR/ai-tools/skills/document-changes" "$HOME/.claude/skills/document-changes"
-ln -sfn "$DOTFILES_DIR/ai-tools/skills/pre-push-audit" "$HOME/.claude/skills/pre-push-audit"
-ln -sfn "$DOTFILES_DIR/ai-tools/skills/pre-push-review" "$HOME/.claude/skills/pre-push-review"
+ln -sfn "$DOTFILES_DIR/ai-tools/developer/skills/document-changes" "$HOME/.claude/skills/document-changes"
+ln -sfn "$DOTFILES_DIR/ai-tools/developer/skills/pre-push-audit" "$HOME/.claude/skills/pre-push-audit"
+ln -sfn "$DOTFILES_DIR/ai-tools/developer/skills/pre-push-review" "$HOME/.claude/skills/pre-push-review"
 
 mkdir -p ~/.claude/hooks
-ln -sf "$DOTFILES_DIR/ai-tools/hooks/secret-store-guard.sh" "$HOME/.claude/hooks/secret-store-guard.sh"
-ln -sf "$DOTFILES_DIR/ai-tools/hooks/push-review-gate.sh" "$HOME/.claude/hooks/push-review-gate.sh"
-ln -sf "$DOTFILES_DIR/ai-tools/hooks/push-review-pretooluse.sh" "$HOME/.claude/hooks/push-review-pretooluse.sh"
-ln -sf "$DOTFILES_DIR/ai-tools/git-hooks/pre-push" "$HOME/.claude/hooks/push-review-git-pre-push.sh"
-ln -sf "$DOTFILES_DIR/ai-tools/git-hooks/install.sh" "$HOME/.claude/hooks/push-review-install-hook.sh"
+ln -sf "$DOTFILES_DIR/ai-tools/all-purpose/hooks/secret-store-guard.sh" "$HOME/.claude/hooks/secret-store-guard.sh"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/hooks/push-review-gate.sh" "$HOME/.claude/hooks/push-review-gate.sh"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/hooks/push-review-pretooluse.sh" "$HOME/.claude/hooks/push-review-pretooluse.sh"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/git-hooks/pre-push" "$HOME/.claude/hooks/push-review-git-pre-push.sh"
+ln -sf "$DOTFILES_DIR/ai-tools/developer/git-hooks/install.sh" "$HOME/.claude/hooks/push-review-install-hook.sh"
 
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
 NEW_HOOKS=$(sed \
   -e "s#__SECRET_STORE_GUARD__#$HOME/.claude/hooks/secret-store-guard.sh#g" \
   -e "s#__PUSH_REVIEW_GATE__#$HOME/.claude/hooks/push-review-pretooluse.sh#g" \
-  "$DOTFILES_DIR/ai-tools/hooks/settings-hooks.json")
+  "$DOTFILES_DIR/ai-tools/developer/hooks/settings-hooks.json")
 
 if [ -f "$CLAUDE_SETTINGS" ]; then
   cp "$CLAUDE_SETTINGS" "$CLAUDE_SETTINGS.bak"

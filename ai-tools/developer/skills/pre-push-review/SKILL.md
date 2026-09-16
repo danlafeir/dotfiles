@@ -35,7 +35,7 @@ Parse `$ARGUMENTS`:
   do — if the checked-out branch itself is `main` with no upstream (the
   normal state for this user's commit-directly-to-main workflow before a
   remote is configured), that self-merge-bases and silently yields an empty
-  range every time. `ai-tools/hooks/push-review-gate.sh` uses the corrected
+  range every time. `ai-tools/developer/hooks/push-review-gate.sh` uses the corrected
   logic above; keep this skill's range derivation in sync with it
   conceptually — Step 6 delegates the actual hashing to that script, so
   they can't drift on what "the diff" means, but Step 1's range still
@@ -84,7 +84,7 @@ ran and that nothing turned up, then run:
 
 (That's the deployed location `bootstrap-mac.sh` symlinks to — this skill runs
 inside whatever project repo you're reviewing, not inside the dotfiles repo,
-so the source-tree path `ai-tools/hooks/...` won't exist there.)
+so the source-tree path `ai-tools/developer/hooks/...` won't exist there.)
 
 Report the result and stop. Don't ask a confirmation question with nothing
 to confirm — this mirrors `document-changes`' "zero proposals" handling.
