@@ -17,8 +17,12 @@
 # pre-push-review skill) share this script's definition of it.
 #
 # `mark-passed` is only ever meant to be run by the `pre-push-review` skill,
-# after it has shown the user its aggregated findings and the user has
-# fixed or explicitly acknowledged them.
+# after it has shown the user its aggregated findings, the user has fixed or
+# explicitly acknowledged them, and the user has walked through every commit
+# in the range. The marker records those commit SHAs and `check` requires
+# them to still match the range: the diff hash alone covers only the
+# cumulative diff, so an amended message or reordered commits with the same
+# net content would otherwise keep a pass for commits the user never saw.
 
 set -euo pipefail
 # Deliberately not -E (errtrace): with it set, this trap fires inside the
@@ -80,6 +84,10 @@ diff_hash() {
   git -C "$REPO_ROOT" diff "$1" | shasum -a 256 | awk '{print $1}'
 }
 
+range_commits() {
+  git -C "$REPO_ROOT" rev-list --reverse "$1"
+}
+
 marker_path() {
   local id
   id=$(printf '%s' "$REPO_ROOT" | shasum -a 256 | awk '{print $1}')
@@ -108,6 +116,16 @@ case "$MODE" in
       echo "diff has changed since the last /pre-push-review run (range $RANGE) - re-run it"
       exit 1
     fi
+    if ! jq -e 'has("walked_commits")' "$MARKER" >/dev/null; then
+      echo "last /pre-push-review run predates the commit walkthrough - re-run it"
+      exit 1
+    fi
+    STORED_COMMITS=$(jq -r '.walked_commits[]' "$MARKER")
+    CURRENT_COMMITS=$(range_commits "$RANGE")
+    if [ "$STORED_COMMITS" != "$CURRENT_COMMITS" ]; then
+      echo "commits in range $RANGE changed since the last commit walkthrough - re-run /pre-push-review"
+      exit 1
+    fi
     if [ "$PASSED" != "true" ]; then
       echo "last /pre-push-review run for this diff did not pass"
       exit 1
@@ -133,19 +151,20 @@ case "$MODE" in
 
     RANGE=$(derive_range)
     HASH=$(diff_hash "$RANGE")
+    COMMITS=$(range_commits "$RANGE")
     mkdir -p "$STATE_DIR"
     MARKER=$(marker_path)
     TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
     if [ -n "$FINDINGS_FILE" ] && [ -f "$FINDINGS_FILE" ]; then
       jq -n --arg repo "$REPO_ROOT" --arg hash "$HASH" --arg range "$RANGE" \
-        --arg ts "$TIMESTAMP" --rawfile findings "$FINDINGS_FILE" \
-        '{repo_root: $repo, diff_hash: $hash, range: $range, timestamp: $ts, passed: true, acknowledged_findings: $findings}' \
+        --arg ts "$TIMESTAMP" --arg commits "$COMMITS" --rawfile findings "$FINDINGS_FILE" \
+        '{repo_root: $repo, diff_hash: $hash, range: $range, timestamp: $ts, passed: true, walked_commits: ($commits | split("\n") | map(select(. != ""))), acknowledged_findings: $findings}' \
         > "$MARKER"
     else
       jq -n --arg repo "$REPO_ROOT" --arg hash "$HASH" --arg range "$RANGE" \
-        --arg ts "$TIMESTAMP" \
-        '{repo_root: $repo, diff_hash: $hash, range: $range, timestamp: $ts, passed: true, acknowledged_findings: null}' \
+        --arg ts "$TIMESTAMP" --arg commits "$COMMITS" \
+        '{repo_root: $repo, diff_hash: $hash, range: $range, timestamp: $ts, passed: true, walked_commits: ($commits | split("\n") | map(select(. != ""))), acknowledged_findings: null}' \
         > "$MARKER"
     fi
 
