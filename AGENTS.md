@@ -18,7 +18,8 @@ Project-specific AGENTS.md (or CLAUDE.md) files layer additional rules on top of
 
 ## Pre-push review gate
 
-- Pushing requires a passing `/pre-push-review` for the current diff — it spins up security, performance, database-integrity, and design/correctness review agents and records a pass/fail decision
+- Pushing requires a passing `/pre-push-review` for the current diff — it spins up security, performance, database-integrity, and design/correctness review agents, then walks you through every commit's diff one at a time (with the option to question any of them in context) before recording a pass/fail decision
+- The pass is keyed to the exact diff *and* commit list, so amending, reordering, or adding commits after the walkthrough requires a fresh review and walkthrough
 - Enforced two ways, both gated on the same per-repo opt-in (`git config push-review.enabled true`): a PreToolUse hook (`ai-tools/developer/hooks/push-review-pretooluse.sh`) blocks `git push` run through Claude Code, and a `pre-push` git hook blocks it for a plain terminal push too
 - Opt a repo in once with `~/.claude/hooks/push-review-install-hook.sh` (installs the git hook and sets the config flag) — deliberately per-repo, not a global `core.hooksPath` override, since that would silently stop any repo-local hook (e.g. the `pre-commit` framework) that doesn't set its own `core.hooksPath`
 - Treat a gate block as confirmation the rule applies, not an obstacle to route around: fix the finding (or acknowledge it in `/pre-push-review`) and re-run, rather than pushing around it
