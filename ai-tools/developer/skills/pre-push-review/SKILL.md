@@ -131,6 +131,15 @@ For each commit *i* of *N*:
    (`git show --format= <sha> -- <path>`) rather than all at once;
    otherwise `git show --format= <sha>`.
 
+   **Merge commits** (`git show --no-patch --format=%P <sha>` lists two or
+   more parents) need different commands: `git show` prints a combined diff
+   that is *empty* for a clean merge, so the user would get a file list, a
+   blank diff, and an approval prompt for a commit they never saw. Instead
+   fetch `git log --oneline <sha>^1..<sha>` (the commits it brings in) and
+   `git diff --stat <sha>^1 <sha>` / `git diff <sha>^1 <sha>` (everything it
+   changes relative to the branch it landed on), and say in the heading that
+   it's a merge.
+
 2. **Post one message per commit** (a very large one may span several
    consecutive messages, one or more files each): a heading with position,
    short SHA and subject (`### Commit 3/7 — a1b2c3d Add retry to fetch`),
