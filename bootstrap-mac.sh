@@ -47,7 +47,8 @@ if [ -z "$CURRENT_KEY" ]; then
   [ -n "$GPG_KEY" ] && git config --file ~/.gitconfig.local user.signingkey "$GPG_KEY"
 fi
 
-mkdir -p ~/.claude && ln -sf "$DOTFILES_DIR/ai-tools/all-purpose/global-claude.md" "$HOME/.claude/CLAUDE.md"
+# Claude Code loads user-scope instructions only from ~/.claude/CLAUDE.md (no user-level AGENTS.md), so the name stays CLAUDE.md
+mkdir -p ~/.claude && ln -sf "$DOTFILES_DIR/AGENTS.md" "$HOME/.claude/CLAUDE.md"
 ln -sf "$DOTFILES_DIR/AGENTS.md" "$HOME/AGENTS.md"
 
 mkdir -p ~/.claude/agents
