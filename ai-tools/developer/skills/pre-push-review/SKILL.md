@@ -25,22 +25,23 @@ check is needed — this skill never touches the working tree.
 
 Parse `$ARGUMENTS`:
 - A commit SHA, range (`abc123..def456`), or `HEAD` → use it verbatim.
-- Nothing given → derive a default:
-  1. If an upstream is configured (`git rev-parse --abbrev-ref --symbolic-full-name @{u}` succeeds), use `@{u}..HEAD`.
-  2. Otherwise, if `refs/remotes/origin/main` or `refs/remotes/origin/master` exists, use `<merge-base of HEAD and that ref>..HEAD`.
-  3. Otherwise (no upstream and no remote-tracking branch at all — e.g. a repo that's never been pushed), use the full history: diff against the empty tree.
+- Nothing given → ask the gate script, which owns the definition of "what's
+  about to be pushed" so the review and the gate can't disagree on it:
 
-  **Do not** fall back to `git merge-base HEAD main` against a *local*
-  branch named `main`/`master` the way `pre-push-audit`/`document-changes`
-  do — if the checked-out branch itself is `main` with no upstream (the
-  normal state for this user's commit-directly-to-main workflow before a
-  remote is configured), that self-merge-bases and silently yields an empty
-  range every time. `ai-tools/developer/hooks/push-review-gate.sh` uses the corrected
-  logic above; keep this skill's range derivation in sync with it
-  conceptually — Step 6 delegates the actual hashing to that script, so
-  they can't drift on what "the diff" means, but Step 1's range still
-  needs to match it for the commit list and path-scoping below to reflect
-  the true diff.
+  ```
+  ~/.claude/hooks/push-review-gate.sh range <repo-root>
+  ```
+
+  (That's the deployed location `bootstrap-mac.sh` symlinks to — this skill
+  runs inside whatever project repo you're reviewing, not inside the
+  dotfiles repo, so the source-tree path `ai-tools/developer/hooks/...`
+  won't exist there.)
+
+  **Don't** derive it yourself with `git merge-base HEAD main` the way
+  `pre-push-audit`/`document-changes` do — if the checked-out branch itself
+  is `main` with no upstream (the normal state for this user's
+  commit-directly-to-main workflow before a remote is configured), that
+  self-merge-bases and silently yields an empty range every time.
 
 List the commits: `git log --reverse --format='%H %s' <range>`. If the list
 is empty, tell the user there's nothing local to review and stop.
