@@ -18,11 +18,15 @@ if [ ! -f "$TEMPLATE_FILE" ]; then
   exit 1
 fi
 
-if [ -f "CLAUDE.md" ]; then
-  printf "CLAUDE.md already exists. Overwrite? (y/N) "
+if [ -f "AGENTS.md" ]; then
+  printf "AGENTS.md already exists. Overwrite? (y/N) "
   read -r answer
   [[ "$answer" != "y" ]] && exit 0
 fi
 
-cp "$TEMPLATE_FILE" CLAUDE.md
-echo "Created CLAUDE.md from $1 template"
+cp "$TEMPLATE_FILE" AGENTS.md
+echo "Created AGENTS.md from $1 template"
+
+if [ -f "CLAUDE.md" ]; then
+  echo "Note: CLAUDE.md exists here, so Claude Code reads it instead of AGENTS.md. Add '@AGENTS.md' to it, or remove it." >&2
+fi
