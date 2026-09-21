@@ -2,4 +2,4 @@
 
 alias python="python3"
 alias check_dir_size="du -hs /"
-alias init-claude="$HOME/dev/dotfiles/ai-tools/init-claude.sh"
+alias init-claude="$HOME/dev/dotfiles/ai-tools/developer/init-claude.sh"
