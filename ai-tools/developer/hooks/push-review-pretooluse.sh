@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PreToolUse backstop for the "don't push without a passing pre-push-review"
-# policy in global-claude.md / AGENTS.md. Blocks `git push` run as a Bash
+# policy in AGENTS.md. Blocks `git push` run as a Bash
 # tool call unless push-review-gate.sh confirms the current diff has an
 # up-to-date passing marker. Fails closed: any internal error blocks too.
 # Companion to ../git-hooks/pre-push, which enforces the same check for

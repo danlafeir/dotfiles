@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PreToolUse backstop for the "never touch secret stores directly" policy in
-# global-claude.md / AGENTS.md. Blocks secret-store CLI reads/writes and
+# AGENTS.md. Blocks secret-store CLI reads/writes and
 # reads/edits of credential-like files; placeholder .env.example-style files
 # are explicitly exempt. Fails closed: any internal error blocks too.
 
