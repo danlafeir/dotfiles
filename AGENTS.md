@@ -1,7 +1,7 @@
 # Agent Guidelines
 
 General guidance for AI agents working in any repo bootstrapped from this dotfiles setup.
-Project-specific CLAUDE.md files layer additional rules on top of these.
+Project-specific AGENTS.md (or CLAUDE.md) files layer additional rules on top of these.
 
 ## Commits
 
@@ -37,7 +37,7 @@ Proceed autonomously:
 
 Pause and confirm before proceeding:
 - Net-new user-defined logic: new features, new algorithms, new data models
-- Destructive or irreversible operations: deletions, migrations, force pushes
+- Destructive or irreversible operations: deletions, migrations, force pushes, drops
 - Security-sensitive changes: auth, identity, access control, permissions, secrets, tokens
 - Infrastructure changes that affect live systems
 - Public API or interface changes that affect callers
@@ -72,11 +72,11 @@ For anything touching auth, identity, access control, permissions, secrets, or t
 
 ## Code style
 
-- No comments unless the WHY is non-obvious
+- No comments unless the WHY is non-obvious — a hidden constraint, a workaround, a subtle invariant
 - No error handling for impossible cases; trust internal guarantees
 - No premature abstractions — three similar lines is better than a helper
 - Prefer editing existing files and suggest refactoring in a separate commit to evolve the code architecture
-- No half-finished implementations or backwards-compatibility shims for removed code
+- No half-finished implementations; no backwards-compatibility shims for removed code
 
 ## Design patterns
 
