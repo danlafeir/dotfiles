@@ -9,7 +9,12 @@
 #
 # Usage:
 #   push-review-gate.sh check <repo-root>
+#   push-review-gate.sh range <repo-root>
 #   push-review-gate.sh mark-passed <repo-root> [--findings-file <path>]
+#
+# `range` prints the commit range the gate treats as "what's about to be
+# pushed", so callers that need to list or diff those commits (the
+# pre-push-review skill) share this script's definition of it.
 #
 # `mark-passed` is only ever meant to be run by the `pre-push-review` skill,
 # after it has shown the user its aggregated findings and the user has
@@ -29,6 +34,7 @@ STATE_DIR="${CLAUDE_STATE_DIR:-$HOME/.claude/state}/pre-push-review"
 
 usage() {
   echo "Usage: $(basename "$0") check <repo-root>" >&2
+  echo "       $(basename "$0") range <repo-root>" >&2
   echo "       $(basename "$0") mark-passed <repo-root> [--findings-file <path>]" >&2
   exit 1
 }
@@ -81,6 +87,10 @@ marker_path() {
 }
 
 case "$MODE" in
+  range)
+    derive_range
+    ;;
+
   check)
     RANGE=$(derive_range)
     HASH=$(diff_hash "$RANGE")
