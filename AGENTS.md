@@ -17,7 +17,7 @@ Project-specific AGENTS.md (or CLAUDE.md) files layer additional rules on top of
     - `Breaking: <what breaks and who is affected>` — public interface or behavior callers must adapt to
     - `Reverts: <sha>` — when undoing an earlier commit
     - `Tested: <how>` — e.g. `Tested: go test ./...`, or `Tested: not run` when it wasn't
-    - `Risk: low|medium|high` — blast radius, so a reviewer or rollback knows where to look
+    - `Safe-To-Revert: true|false` — `true` only if `git revert` alone fully undoes the change; `false` when it leaves effects behind that need manual intervention (an applied migration, changed data or schema, a data-access pattern other code now depends on, published artifacts, external side effects). Follow `false` with a dash and the steps needed to roll back, e.g. `Safe-To-Revert: false — migration 0042 already dropped legacy_id; restore from backup, then revert`
     - `Co-Authored-By:` / `Assisted-by:` — attribution, as the harness instructs
 - Never batch unrelated changes into one commit
 - If a change is guarded by passing tests or is pure refactor, commit without asking
