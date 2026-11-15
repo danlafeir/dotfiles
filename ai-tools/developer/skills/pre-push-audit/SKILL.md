@@ -1,6 +1,6 @@
 ---
 name: pre-push-audit
-description: Scans a project's dependencies for known vulnerabilities and runs static analysis over files changed in local commits, before you push. Spins up the `pre-push-audit-agent` subagent to find real advisories (never recalled from memory) and lint findings; confirms with you before touching anything; applies approved dependency bumps, runs the test suite, and folds the fix into the right commit (amend, fixup, or a new `fix(deps):` commit — never a pushed commit). Static analysis findings are reported only, not auto-fixed. Use when the user asks to "audit dependencies", "check for vulnerable packages", "scan for CVEs", "run static analysis on my changes", or wants a pre-push security check on packages — not for reviewing your own code's logic for vulnerabilities (that's the `security-review` skill).
+description: Scans a project's dependencies for known vulnerabilities and runs static analysis over files changed in local commits, before you push. Spins up the `pre-push-audit-agent` subagent to find real advisories (never recalled from memory) and lint findings; confirms with you before touching anything; applies approved dependency bumps, runs the test suite, and folds the fix into the right commit (amend, fixup, or a new dependency-bump commit — never a pushed commit). Static analysis findings are reported only, not auto-fixed. Use when the user asks to "audit dependencies", "check for vulnerable packages", "scan for CVEs", "run static analysis on my changes", or wants a pre-push security check on packages — not for reviewing your own code's logic for vulnerabilities (that's the `security-review` skill).
 ---
 
 # /pre-push-audit
@@ -133,7 +133,9 @@ different packages are often entangled by transitive resolution anyway. So:
      changes them.
    - **Already pushed** — never amend. Fall through to a new commit.
 
-New-commit message format: `fix(deps): bump <pkg1>, <pkg2>, ... (<advisory ids>)`.
+New-commit message format: subject `Bump <pkg1>, <pkg2>, ... to patched versions`, a body naming
+each advisory and why the bump is needed, then trailers per the commit rules in
+AGENTS.md (e.g. `Refs: <advisory ids>`, `Tested: <test command>`).
 
 Process one manifest/lockfile pair fully (fold, and re-derive SHAs if you
 rebased) before moving to the next.

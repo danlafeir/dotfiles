@@ -7,7 +7,18 @@ Project-specific AGENTS.md (or CLAUDE.md) files layer additional rules on top of
 
 - Commit after each self-contained change: a function added, a bug fixed, a config updated
 - Keep commits small and focused — one logical unit per commit
-- Write commit messages that explain why, not what
+- Write commit messages the way git itself articulates them (see `git help commit` and Git's `SubmittingPatches`) — not Conventional Commits: no `feat:`/`fix(scope):` type prefixes
+  - Subject: imperative mood ("Add retry to webhook handler", not "Added"/"Adds"), capitalized, no trailing period, ~50 chars, completing the sentence "If applied, this commit will ..."
+  - Blank line, then a body wrapped at ~72 chars explaining *why*: the problem or motivation, how the previous behavior fell short, and why this approach over alternatives — the diff already shows what
+  - Omit the body only when the subject says it all
+  - Finish with git trailers (`Key: value`, one per line, after a blank line) carrying machine-readable signals for agents and tooling; include only the ones that apply:
+    - `Jira: PROJ-123` — ticket this work belongs to (repeat the line for several); take it from the branch name, user, or prior commits — never invent one
+    - `Fixes: <sha> ("subject")` / `Refs: <url or id>` — the bug-introducing commit, or related issues/PRs/docs
+    - `Breaking: <what breaks and who is affected>` — public interface or behavior callers must adapt to
+    - `Reverts: <sha>` — when undoing an earlier commit
+    - `Tested: <how>` — e.g. `Tested: go test ./...`, or `Tested: not run` when it wasn't
+    - `Risk: low|medium|high` — blast radius, so a reviewer or rollback knows where to look
+    - `Co-Authored-By:` / `Assisted-by:` — attribution, as the harness instructs
 - Never batch unrelated changes into one commit
 - If a change is guarded by passing tests or is pure refactor, commit without asking
 
