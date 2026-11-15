@@ -102,7 +102,8 @@ marker_path() {
   echo "$STATE_DIR/$id.json"
 }
 
-# Dependency manifests, lockfiles, Dockerfiles and deploy/infra config are
+# Lockfiles and Dockerfiles count as build config. Dependency manifests
+# (package.json, go.mod, requirements.txt, ...) and deploy/infra config are
 # deliberately absent: they change what ships, so they stay `deployed`.
 # --no-renames lists both sides of a move, so renaming src/ code into docs/
 # can't hide the deleted source path.
@@ -114,6 +115,11 @@ is_non_deployed_path() {
     *_test.go|*_test.py|test_*.py|*/test_*.py|*.test.*|*.spec.*) return 0 ;;
     .github/*|.gitlab-ci.yml|.circleci/*|Makefile|*/Makefile|justfile) return 0 ;;
     .pre-commit-config.yaml|.editorconfig|.gitignore|.gitattributes) return 0 ;;
+    Dockerfile|Dockerfile.*|*/Dockerfile|*/Dockerfile.*|*.dockerfile|.dockerignore) return 0 ;;
+    package-lock.json|*/package-lock.json|yarn.lock|*/yarn.lock) return 0 ;;
+    pnpm-lock.yaml|*/pnpm-lock.yaml|go.sum|*/go.sum|Cargo.lock|*/Cargo.lock) return 0 ;;
+    poetry.lock|*/poetry.lock|uv.lock|*/uv.lock|Pipfile.lock|*/Pipfile.lock) return 0 ;;
+    Gemfile.lock|*/Gemfile.lock|composer.lock|*/composer.lock) return 0 ;;
   esac
   return 1
 }

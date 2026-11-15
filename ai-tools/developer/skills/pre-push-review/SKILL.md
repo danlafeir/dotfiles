@@ -61,13 +61,12 @@ disagree:
 ```
 
 - **`light`** — every changed path is documentation, tests, or build/CI
-  config, so nothing deployed changes. Tell the user no review is required
+  config (including lockfiles and Dockerfiles), so nothing deployed changes. Tell the user no review is required
   and the gate will pass this push on its own. Do not run agents, do not walk
   the commits, do not run `mark-passed`; stop here. (If the user explicitly
   asked for a review of a light range anyway, continue as for `deployed`.)
-- **`deployed`** — at least one path may ship (source, dependency manifests
-  and lockfiles, Dockerfiles, deploy/infra config, or anything the classifier
-  doesn't recognise). Continue: this review is required.
+- **`deployed`** — at least one path may ship (source, dependency manifests,
+  deploy/infra config, or anything the classifier doesn't recognise). Continue: this review is required.
 
 Get the changed files with `git diff --name-only --diff-filter=ACMR <range>`.
 
