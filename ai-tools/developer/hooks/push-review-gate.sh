@@ -10,11 +10,18 @@
 # Usage:
 #   push-review-gate.sh check <repo-root>
 #   push-review-gate.sh range <repo-root>
+#   push-review-gate.sh classify <repo-root>
 #   push-review-gate.sh mark-passed <repo-root> [--findings-file <path>]
 #
 # `range` prints the commit range the gate treats as "what's about to be
 # pushed", so callers that need to list or diff those commits (the
 # pre-push-review skill) share this script's definition of it.
+#
+# `classify` prints `deployed` or `light`. A range is `light` only when every
+# changed path is documentation, tests, or build/CI config — none of which
+# ship in a deployed artifact — and `check` passes those pushes without a
+# recorded review. Anything unrecognised counts as `deployed`, so a path the
+# patterns below don't know about fails closed into requiring the review.
 #
 # `mark-passed` is only ever meant to be run by the `pre-push-review` skill,
 # after it has shown the user its aggregated findings, the user has fixed or
@@ -39,6 +46,7 @@ STATE_DIR="${CLAUDE_STATE_DIR:-$HOME/.claude/state}/pre-push-review"
 usage() {
   echo "Usage: $(basename "$0") check <repo-root>" >&2
   echo "       $(basename "$0") range <repo-root>" >&2
+  echo "       $(basename "$0") classify <repo-root>" >&2
   echo "       $(basename "$0") mark-passed <repo-root> [--findings-file <path>]" >&2
   exit 1
 }
@@ -94,13 +102,49 @@ marker_path() {
   echo "$STATE_DIR/$id.json"
 }
 
+# Dependency manifests, lockfiles, Dockerfiles and deploy/infra config are
+# deliberately absent: they change what ships, so they stay `deployed`.
+# --no-renames lists both sides of a move, so renaming src/ code into docs/
+# can't hide the deleted source path.
+is_non_deployed_path() {
+  case "$1" in
+    *.md|*.mdx|*.rst|*.adoc|docs/*|doc/*|LICENSE*|CHANGELOG*) return 0 ;;
+    test/*|tests/*|*/test/*|*/tests/*|__tests__/*|*/__tests__/*) return 0 ;;
+    spec/*|*/spec/*|testdata/*|*/testdata/*|*/fixtures/*) return 0 ;;
+    *_test.go|*_test.py|test_*.py|*/test_*.py|*.test.*|*.spec.*) return 0 ;;
+    .github/*|.gitlab-ci.yml|.circleci/*|Makefile|*/Makefile|justfile) return 0 ;;
+    .pre-commit-config.yaml|.editorconfig|.gitignore|.gitattributes) return 0 ;;
+  esac
+  return 1
+}
+
+classify_range() {
+  local path
+  while IFS= read -r path; do
+    [ -z "$path" ] && continue
+    if ! is_non_deployed_path "$path"; then
+      echo deployed
+      return
+    fi
+  done < <(git -C "$REPO_ROOT" diff --name-only --no-renames "$1")
+  echo light
+}
+
 case "$MODE" in
   range)
     derive_range
     ;;
 
+  classify)
+    classify_range "$(derive_range)"
+    ;;
+
   check)
     RANGE=$(derive_range)
+    if [ "$(classify_range "$RANGE")" = light ]; then
+      echo "range $RANGE changes only docs, tests, or build config - no /pre-push-review needed"
+      exit 0
+    fi
     HASH=$(diff_hash "$RANGE")
     MARKER=$(marker_path)
 
