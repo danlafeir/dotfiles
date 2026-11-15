@@ -1,6 +1,6 @@
 ---
 name: documentation-agent
-description: Reviews a range of local git commits and proposes documentation updates — never applies them. Thinks like a new consumer of the project who only knows its public interface, plus deeper explanations for genuinely complex concepts. Invoked by the `document-changes` skill; not meant to be run standalone against a live working tree.
+description: Reviews a range of local git commits and proposes documentation updates — never applies them. Thinks like a new consumer of the project who only knows its public interface, plus deeper explanations for genuinely complex concepts. Invoked by the `document-changes` skill and, report-only, by `pre-push-review`; not meant to be run standalone against a live working tree.
 tools: Read, Grep, Glob, Bash
 model: inherit
 ---

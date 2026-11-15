@@ -1,13 +1,15 @@
 ---
 name: pre-push-review
-description: Runs security, performance, database-integrity, and design/correctness review agents over local commits before a push, then walks the user through every commit's diff one at a time — with the option to question any diff in the context of the surrounding code — and only then records a pass/fail decision that the push-review gate (a Claude Code PreToolUse hook and a global git pre-push hook) checks before allowing `git push` to run. Report-only — it never edits files or folds anything into a commit, since findings like "this migration has no rollback" can't be auto-applied the way a dependency bump can. Use when the user asks to "review before I push", "run the push gate", "check my changes before pushing", "walk me through my commits", or runs `/pre-push-review` — not for dependency CVEs or lint findings (that's `pre-push-audit`) and not for reuse/simplification cleanups (that's the built-in `/code-review`).
+description: Required before pushing changes to deployed code (docs-, test-, and build-config-only pushes skip it). Runs the required security, documentation, and design/correctness review agents — plus optional performance and database-integrity agents on request — over local commits before a push, then walks the user through every commit's diff one at a time — with the option to question any diff in the context of the surrounding code — and only then records a pass/fail decision that the push-review gate (a Claude Code PreToolUse hook and a global git pre-push hook) checks before allowing `git push` to run. Report-only — it never edits files or folds anything into a commit, since findings like "this migration has no rollback" can't be auto-applied the way a dependency bump can. Use when the user asks to "review before I push", "run the push gate", "check my changes before pushing", "walk me through my commits", or runs `/pre-push-review` — not for dependency CVEs or lint findings (that's `pre-push-audit`) and not for reuse/simplification cleanups (that's the built-in `/code-review`).
 ---
 
 # /pre-push-review
 
-Runs four read-only review agents — security, performance, database
-integrity, and design/correctness — over the commits about to be pushed, then
-walks you through every commit's diff yourself, one at a time, and records
+Required when a push changes deployed code; skipped for pushes that only
+touch documentation, tests, or build/CI config. For a push that needs it,
+runs three required read-only review agents — security, documentation, and
+code design/correctness — over the commits about to be pushed (performance
+and database-integrity agents are optional extras), then walks you through every commit's diff yourself, one at a time, and records
 whether the push-review gate should let the push through. The agents' default
 outcome is "nothing found"; the walkthrough is never skipped — the gate only
 passes once you've been through every commit in the range.
@@ -48,29 +50,56 @@ Parse `$ARGUMENTS`:
 List the commits: `git log --reverse --format='%H %s' <range>`. If the list
 is empty, tell the user there's nothing local to review and stop.
 
-## Step 2 — decide which agents to run
+## Step 2 — decide whether review applies, and which agents to run
 
-Get the changed files: `git diff --name-only --diff-filter=ACMR <range>`.
-These are heuristics, not a hard science — tune them over time rather than
-treating them as exact:
+First ask the gate whether this push needs a review at all — it owns the
+definition, and `check` uses the same answer, so the skill and the gate can't
+disagree:
 
-- **`design-review-agent`** — always run. Correctness issues can show up
-  anywhere, and this agent is cheap.
-- **`db-integrity-agent`** — only if at least one changed path looks like a
+```
+~/.claude/hooks/push-review-gate.sh classify <repo-root>
+```
+
+- **`light`** — every changed path is documentation, tests, or build/CI
+  config, so nothing deployed changes. Tell the user no review is required
+  and the gate will pass this push on its own. Do not run agents, do not walk
+  the commits, do not run `mark-passed`; stop here. (If the user explicitly
+  asked for a review of a light range anyway, continue as for `deployed`.)
+- **`deployed`** — at least one path may ship (source, dependency manifests
+  and lockfiles, Dockerfiles, deploy/infra config, or anything the classifier
+  doesn't recognise). Continue: this review is required.
+
+Get the changed files with `git diff --name-only --diff-filter=ACMR <range>`.
+
+**Required agents** — always run for a `deployed` range:
+
+- **`security-review-agent`**
+- **`documentation-agent`** — report-only here: it proposes doc updates for
+  public-interface changes and writes nothing, same as under
+  `document-changes`. Its default outcome is zero proposals. Pass it the repo
+  root and commit list like the others; its proposals are findings for Step 4,
+  and applying them is the user's call afterward (or via `document-changes`).
+- **`design-review-agent`** — code design and correctness.
+
+**Optional agents** — not part of the required review. Run one only when
+`$ARGUMENTS` asks for it (`performance`, `db`) or the user says so; otherwise
+skip it and say so in the report. Use these heuristics to *suggest* it in the
+report when it would plausibly have mattered, without running it:
+
+- **`db-integrity-agent`** — worth suggesting if a changed path looks like a
   migration or schema file: `migrations/`, `db/migrate/`, `alembic/versions/`,
   `prisma/schema.prisma`, `schema.rb`, `**/migrations/*.py`, or a `.sql`
   file under a directory whose name contains "migrat".
-- **`security-review-agent`** and **`performance-review-agent`** — run
-  unless every changed file is docs/asset/fixture-shaped (`*.md`, `docs/**`,
-  images, `test/fixtures/**`, lockfiles with no accompanying manifest
-  change). Run them whenever at least one real source file changed.
+- **`performance-review-agent`** — worth suggesting if real source files
+  changed that touch queries, loops over external input, or async/IO paths.
 
-If a category's trigger condition isn't met, don't call that agent at all —
-say so plainly in the final report rather than silently omitting it.
+Say plainly in the final report which optional agents were skipped (and
+which you'd suggest running) rather than silently omitting them.
 
 ## Step 3 — spin up the review agents
 
-Call the Agent tool once per agent selected in Step 2, **in a single message
+Call the Agent tool once per agent selected in Step 2 (the three required
+ones, plus any optional ones that were requested), **in a single message
 with multiple tool calls** (they're independent, read-only investigations —
 same pattern as running several Explore agents in parallel). Give each one
 the repo root (`git rev-parse --show-toplevel`) and the commit list from
@@ -210,7 +239,8 @@ in the repo:
 
 ## Step 7 — wrap up
 
-Report: which agents ran (and which were skipped, per Step 2, and why),
+Report: whether the push was classified `light` (and so skipped) or
+`deployed`, which agents ran (and which optional ones were skipped, and why),
 what each found, what the user chose to fix vs. acknowledge, how many
 commits were approved and which were flagged (or that the walkthrough was
 stopped early), and whether a passing marker was written. If the push is
