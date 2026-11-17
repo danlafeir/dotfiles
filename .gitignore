@@ -5,3 +5,5 @@ bin
 .vim/undodir
 .vim/plugged/
 .vim/.vim
+*.local
+*.local.*

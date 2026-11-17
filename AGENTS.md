@@ -62,6 +62,16 @@ For anything touching auth, identity, access control, permissions, secrets, or t
 - After implementing: don't just summarize — ask specific questions that force active confirmation of each significant decision, e.g. "this grants X role Y permission on Z, scoped to W — confirm this matches intent and isn't broader than needed"
 - Run the `security-review` skill on the change before considering it done
 
+## Machine-local files (`.local`)
+
+In the dotfiles repo (`~/dev/dotfiles`), any file named `*.local` or `*.local.*` is gitignored but still bootstrapped: `link-local.sh` (run by `bootstrap-mac.sh`) symlinks each one into `$HOME` at the same relative path (`.zshrc.local` -> `~/.zshrc.local`, `foo/bar.local.json` -> `~/foo/bar.local.json`).
+
+- Put machine-specific or private config there (work overrides, per-host settings) — never in tracked files, and never commit it; the gitignore rule keeps it out
+- The files live only on that machine: they are not in git or the `install.sh` tarball, so a fresh machine must recreate them, then re-run `link-local.sh`
+- An existing real (non-symlink) file at the destination is skipped with a warning, never overwritten
+- `.claude/`, `.git/`, `.vim/undodir`, and `.vim/plugged` are skipped, so a project's own `.claude/settings.local.json` is not promoted to `$HOME`
+- A tracked file must source/include its `.local` counterpart to use it (e.g. `.gitconfig` includes `~/.gitconfig.local`)
+
 ## Secrets and credentials
 
 - Never read or write real secret values directly through a secret store: no `op read`/`item get` (1Password), `aws secretsmanager`/`ssm --with-decryption`, `gcloud secrets versions access`, `az keyvault secret show`, `vault kv get`/`read`, macOS Keychain (`security find-*-password -w`), `kubectl get secret -o json/yaml`, `sops -d`, `gpg -d`, or printing real `.env`/credentials files

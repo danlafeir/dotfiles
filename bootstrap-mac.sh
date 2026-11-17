@@ -30,6 +30,8 @@ ln -sf "$HOME/.vim/autoload/plug.vim" "$NVIM_PLUG"
 # Install all vim/neovim plugins
 vim +PlugInstall +qall
 nvim +PlugInstall +qall
+"$DOTFILES_DIR/link-local.sh"
+
 CURRENT_KEY=$(git config --file ~/.gitconfig.local user.signingkey 2>/dev/null)
 if [ -z "$CURRENT_KEY" ]; then
   GPG_KEYS=($(gpg --list-secret-keys --keyid-format LONG 2>/dev/null | grep '^sec' | awk '{print $2}' | cut -d'/' -f2))

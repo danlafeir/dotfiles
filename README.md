@@ -7,6 +7,10 @@
 ./bootstrap-mac.sh
 ```
 
+## Local files
+
+Files named `*.local` or `*.local.*` are gitignored but symlinked into `$HOME` (same relative path) by `./link-local.sh`, which `bootstrap-mac.sh` runs. Use them for machine-specific config; a tracked file must source or include its `.local` counterpart.
+
 ## Installing packages
 
 Brewfiles are opt-in. Run whichever you need:
