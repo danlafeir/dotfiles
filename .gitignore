@@ -7,3 +7,4 @@ bin
 .vim/.vim
 *.local
 *.local.*
+.generated/

@@ -64,13 +64,15 @@ For anything touching auth, identity, access control, permissions, secrets, or t
 
 ## Machine-local files (`.local`)
 
-In the dotfiles repo (`~/dev/dotfiles`), any file named `*.local` or `*.local.*` is gitignored but still bootstrapped: `link-local.sh` (run by `bootstrap-mac.sh`) symlinks each one into `$HOME` at the same relative path (`.zshrc.local` -> `~/.zshrc.local`, `foo/bar.local.json` -> `~/foo/bar.local.json`).
+In the dotfiles repo (`~/dev/dotfiles`), any file named `*.local` or `*.local.*` is gitignored but still bootstrapped by `link-local.sh` (run by `bootstrap-mac.sh`), and it takes precedence over its tracked base file.
 
-- Put machine-specific or private config there (work overrides, per-host settings) — never in tracked files, and never commit it; the gitignore rule keeps it out
-- The files live only on that machine: they are not in git or the `install.sh` tarball, so a fresh machine must recreate them, then re-run `link-local.sh`
+- Standalone (no base): symlinked into `$HOME` at the same relative path (`foo.local` -> `~/foo.local`)
+- With a base (`.zshrc` for `.zshrc.local`, `foo.json` for `foo.local.json`): the two are merged, local winning, into `.generated/<base>` (gitignored) and `~/<base>` links there. Text files are concatenated base-then-local, so later lines win (right for shell, vim, tmux, git config); `.json` is deep-merged with local values winning
+- Merged output is generated, not live: re-run `./link-local.sh` after editing either the base or the `.local` file
+- Put machine-specific or private config in `.local` files — never in tracked files, and never commit them
+- They live only on that machine (not in git or the `install.sh` tarball); a fresh machine must recreate them, then re-run `link-local.sh`
 - An existing real (non-symlink) file at the destination is skipped with a warning, never overwritten
-- `.claude/`, `.git/`, `.vim/undodir`, and `.vim/plugged` are skipped, so a project's own `.claude/settings.local.json` is not promoted to `$HOME`
-- A tracked file must source/include its `.local` counterpart to use it (e.g. `.gitconfig` includes `~/.gitconfig.local`)
+- `.claude/`, `.git/`, `.generated/`, `.vim/undodir`, and `.vim/plugged` are skipped, so a project's own `.claude/settings.local.json` is not promoted to `$HOME`
 
 ## Secrets and credentials
 

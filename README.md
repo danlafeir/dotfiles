@@ -9,7 +9,7 @@
 
 ## Local files
 
-Files named `*.local` or `*.local.*` are gitignored but symlinked into `$HOME` (same relative path) by `./link-local.sh`, which `bootstrap-mac.sh` runs. Use them for machine-specific config; a tracked file must source or include its `.local` counterpart.
+Files named `*.local` or `*.local.*` are gitignored and installed by `./link-local.sh` (run by `bootstrap-mac.sh`). If a base file exists (`.zshrc.local` next to `.zshrc`), they are merged with the `.local` content taking precedence: text files are concatenated base-then-local, `.json` is deep-merged. The result goes to `.generated/` and `$HOME` links to it, so re-run `./link-local.sh` after edits. Without a base, the file is just symlinked into `$HOME`.
 
 ## Installing packages
 
