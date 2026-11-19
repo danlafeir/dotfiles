@@ -1,0 +1,9 @@
+git
+zsh
+vim
+neovim
+tmux
+jq
+curl
+gnupg
+pinentry-curses

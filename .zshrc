@@ -8,6 +8,14 @@ plugins=(
   git
 )
 
+# Profiles contribute shell snippets; the active list is written by bootstrap.sh.
+if [ -r "$HOME/.config/dotfiles/profiles" ]; then
+  for p in ${(f)"$(<$HOME/.config/dotfiles/profiles)"}; do
+    for f in "$DOTFILES_DIR"/profiles/$p/zsh.d/*.zsh(N); do source "$f"; done
+  done
+  unset p f
+fi
+
 source $ZSH/oh-my-zsh.sh
 
 for file in ~/.{functions,aliases,zshconfig,machine_specific_config}; do
@@ -26,11 +34,5 @@ export PS1=$BASIC_TERMINAL
 
 # Rancher config
 export PATH="$HOME/.rd/bin:$PATH"
-
-# python config
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-command -v pyenv >/dev/null && eval "$(pyenv init -)"
-
 
 [ -r "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
