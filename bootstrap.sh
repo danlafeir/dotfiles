@@ -109,8 +109,8 @@ if [ "$DRY_RUN" != true ]; then
 fi
 
 if [ "$SKIP_PACKAGES" != true ]; then
-  install_shell_tooling
   platform_install_packages
+  install_shell_tooling
 fi
 link_shell_config
 if [ "$SKIP_PACKAGES" != true ]; then

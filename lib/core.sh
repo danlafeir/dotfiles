@@ -4,10 +4,13 @@
 # SKIP_PACKAGES, UPGRADE.
 
 install_shell_tooling() {
-  if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    run env RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
-      "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  fi
+  [ -d "$HOME/.oh-my-zsh" ] && return 0
+  local installer
+  installer="$(mktemp "${TMPDIR:-/tmp}/ohmyzsh.XXXXXX")"
+  # Download to a file first: failure inside a $(...) argument would not stop the script.
+  run curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -o "$installer"
+  run env RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh "$installer"
+  rm -f "$installer"
 }
 
 link_shell_config() {

@@ -26,8 +26,8 @@ linked files are live. A real file already at a destination is moved to
 
 ### What it does, in order
 
-1. Installs oh-my-zsh, then packages for the active profiles (`brew bundle` per
-   `brewfile` on macOS; `apt-get install` from each `apt.txt` on Linux).
+1. Installs packages for the active profiles (`brew bundle` per
+   `brewfile` on macOS; `apt-get install` from each `apt.txt` on Linux), then oh-my-zsh.
 2. Symlinks shell, git, vim, tmux dotfiles into `$HOME`; links vim and neovim to the
    same config and installs plugins.
 3. Runs `link-local.sh` (see [Local customization](#local-customization)).
