@@ -62,18 +62,9 @@ For anything touching auth, identity, access control, permissions, secrets, or t
 - After implementing: don't just summarize — ask specific questions that force active confirmation of each significant decision, e.g. "this grants X role Y permission on Z, scoped to W — confirm this matches intent and isn't broader than needed"
 - Run the `security-review` skill on the change before considering it done
 
-## Machine-local files (`.local`)
+## Dotfiles repo conventions
 
-In the dotfiles repo (`~/dev/dotfiles`), any file named `*.local` or `*.local.*` is gitignored but still bootstrapped by `link-local.sh` (run by `bootstrap-mac.sh`), and it takes precedence over its tracked base file.
-
-- Standalone (no base): symlinked into `$HOME` at the same relative path (`foo.local` -> `~/foo.local`)
-- With a base (`foo.json` for `foo.local.json`): the two are merged, local winning, into `.generated/<base>` (gitignored) and `~/<base>` links there. Text files are concatenated base-then-local, so later lines win (right for shell, vim, tmux); `.json` is deep-merged with local values winning
-- Exception: if the base file already names its `.local` file (a source/include line, e.g. `.zshrc` sources `~/.zshrc.local`, `.gitconfig` includes `~/.gitconfig.local`), the base loads it itself, so the `.local` file is only symlinked, not merged — keep that line at the end of the base so local wins
-- Merged output is generated, not live: re-run `./link-local.sh` after editing either the base or the `.local` file
-- Put machine-specific or private config in `.local` files — never in tracked files, and never commit them
-- They live only on that machine (not in git or the `install.sh` tarball); a fresh machine must recreate them, then re-run `link-local.sh`
-- An existing real (non-symlink) file at the destination is skipped with a warning, never overwritten
-- `.claude/`, `.git/`, `.generated/`, `.vim/undodir`, and `.vim/plugged` are skipped, so a project's own `.claude/settings.local.json` is not promoted to `$HOME`
+When editing the dotfiles repo (`~/dev/dotfiles`, source of this file), read its `CLAUDE.md` first: it covers the `.local` override convention (gitignored `*.local` / `*.local.*` files that are installed by `bootstrap.sh` and take precedence over their tracked base file), profiles, and how to add agents, skills, and hooks.
 
 ## Secrets and credentials
 
