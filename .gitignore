@@ -1,10 +1,10 @@
 .idea/
 .key
-out
-bin
+/out
 .vim/undodir
 .vim/plugged/
 .vim/.vim
 *.local
 *.local.*
 .generated/
+.vim/.netrwhist
