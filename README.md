@@ -7,43 +7,66 @@ room for per-machine and personal-versus-professional variation.
 ## Bootstrap
 
 ```bash
-./bootstrap-mac.sh            # core setup
-./bootstrap-mac.sh personal   # core + personal brewfile
+./bootstrap.sh                          # base profile (or the saved list)
+./bootstrap.sh --profile personal,infra # pick profiles; saved for next time
+./bootstrap.sh --dry-run                # print what would change, write nothing
+./bootstrap.sh --skip-packages          # link config only
+./bootstrap.sh --upgrade                # also upgrade installed packages
+./bootstrap.sh doctor                   # check every link made by earlier runs
 ```
 
-Or on a blank Mac: download `install.sh` and run `bash install.sh [personal]`
-(it unpacks the repo to `~/.dotfiles`, then runs the bootstrap).
-`bootstrap-linux.sh` and `bootstrap-windows.bat` are stubs; see
-[docs/roadmap.md](docs/roadmap.md). Windows has a manual guide in
-`personal-windows/README.md`.
+On a blank machine, download `install.sh` and run `bash install.sh [bootstrap options]`.
+It clones the repo to `~/.dotfiles` (tarball fallback if git is missing) and runs
+`bootstrap.sh`. macOS (Homebrew) and Linux (apt, untested) are supported; Windows is a
+manual guide in `personal-windows/README.md` and `bootstrap-windows.bat` is a stub.
 
-`bootstrap-mac.sh` is meant to be re-run: it symlinks rather than copies,
-so repo edits to symlinked files are live.
+The bootstrap is meant to be re-run: it symlinks rather than copies, so edits to
+linked files are live. A real file already at a destination is moved to
+`<name>.pre-dotfiles`.
 
 ### What it does, in order
 
-1. Installs oh-my-zsh and Homebrew if missing, runs `brew upgrade`, then
-   `brew bundle` on `personal-mac/brewfile` (plus `brewfile.personal`
-   when `personal` is passed).
-2. Symlinks shell, git, vim, tmux dotfiles into `$HOME`; links vim and
-   neovim to the same config and installs plugins.
+1. Installs oh-my-zsh, then packages for the active profiles (`brew bundle` per
+   `brewfile` on macOS; `apt-get install` from each `apt.txt` on Linux).
+2. Symlinks shell, git, vim, tmux dotfiles into `$HOME`; links vim and neovim to the
+   same config and installs plugins.
 3. Runs `link-local.sh` (see [Local customization](#local-customization)).
 4. Picks a GPG signing key and writes it to `~/.gitconfig.local`.
 5. Links the AI tooling into `~/.claude` (see [AI tooling](#ai-tooling)).
-6. Links the GPG agent and SSH config.
+6. Generates `~/.gnupg/gpg-agent.conf` with the detected pinentry path and links the
+   SSH config.
+7. Runs each active profile's `setup.sh`.
+
+## Profiles
+
+Opt-in bundles live in `profiles/<name>/`; `base` is always on. The active list is
+saved in `~/.config/dotfiles/profiles` (machine-local, not committed).
+
+| Profile | Adds |
+| --- | --- |
+| `base` | Core tools (brewfile/apt.txt) and the `all-purpose` and `developer` AI tiers. |
+| `personal` | Personal apps (brewfile). |
+| `infra` | kubernetes, helm, terraform, docker/Rancher (brewfile). |
+| `python` | pyenv, pipx (brewfile), a shell snippet for pyenv and completions, `setup.sh`. |
+| `manager` | Links the `manager` AI tier (empty today). |
+
+A profile directory may contain: `brewfile`, `apt.txt`, `setup.sh`, `zsh.d/*.zsh`
+(sourced by `.zshrc`), and `ai-tiers` (one tier per line). To add a profile, create the
+directory and run `./bootstrap.sh --profile <name>`.
 
 ## Layout
 
 | Path | Purpose |
 | --- | --- |
-| `.zshrc`, `.zshconfig`, `.aliases`, `.functions` | Shell. `.zshrc` sources the other three, then `~/.zshrc.local` last. |
+| `bootstrap.sh`, `lib/` | Entry point; `core.sh` is platform-neutral, `mac.sh` and `linux.sh` install packages. |
+| `profiles/` | Opt-in bundles (see above). |
+| `.zshrc`, `.zshconfig`, `.aliases`, `.functions` | Shell. `.zshrc` sources profile snippets and the other files, then `~/.zshrc.local` last. |
 | `.gitconfig`, `.vimrc` + `.vim/`, `.tmux.conf` | Git (includes `~/.gitconfig.local`), vim/neovim, tmux. |
-| `.gpg-agent.conf`, `.ssh_config` | Linked to `~/.gnupg/` and `~/.ssh/config`. |
-| `personal-mac/` | Base mac brewfile and the opt-in `brewfile.personal`. |
-| `infrastructure/`, `language-specific/` | Opt-in brewfiles and setup (k8s/terraform, python). Run by hand. |
+| `.gpg-agent.conf`, `.ssh_config` | Source for `~/.gnupg/gpg-agent.conf` and `~/.ssh/config`. |
 | `ai-tools/` | Claude Code agents, skills, hooks and project templates, split by audience. |
-| `AGENTS.md` | Global agent instructions, symlinked to `~/AGENTS.md` and `~/.claude/CLAUDE.md`. |
+| `AGENTS.md`, `CLAUDE.md` | Global agent instructions (symlinked to `~/AGENTS.md` and `~/.claude/CLAUDE.md`); rules for working in this repo. |
 | `link-local.sh` | Installs gitignored `.local` files. |
+| `tests/run.sh` | Tests against a throwaway `$HOME`. |
 
 ## Local customization
 
@@ -61,22 +84,18 @@ or private config.
   base-then-local; JSON is deep-merged. Re-run `./link-local.sh` after
   editing either file.
 - **No base**: just symlinked to the same relative path.
-- Existing real files at the destination are skipped with a warning.
+- A real file where a standalone `.local` would link is skipped with a warning; a real
+  file where a merged base lands is moved to `<name>.pre-dotfiles`.
   `.claude/`, `.git/`, `.generated/`, `.vim/undodir` and `.vim/plugged`
   are skipped.
 
 `.local` files are not in git, so a new machine must recreate them.
 
-## Opt-in tooling
-
-Today the opt-ins are manual:
+## Per-repo opt-ins
 
 ```bash
-brew bundle --file infrastructure/brewfile            # k8s, helm, terraform, docker
-brew bundle --file language-specific/python/brewfile  # pyenv, pipx
-bash language-specific/python/bootstrap.sh            # see roadmap caveats first
-~/.claude/hooks/push-review-install-hook.sh           # per repo: push-review gate
-init-claude <template>                                # per project: AGENTS.md from a template
+~/.claude/hooks/push-review-install-hook.sh   # per repo: push-review gate
+init-claude <template>                        # per project: AGENTS.md from a template
 ```
 
 ## AI tooling
@@ -92,10 +111,13 @@ bootstrap:
   `pre-push-audit` and `document-changes` skills, the push-review gate
   (a Claude Code hook plus a per-repo git `pre-push` hook), and
   `templates/` for per-project `AGENTS.md`.
-- `manager/`: reserved, empty.
+- `manager/`: reserved, empty. Linked only when the `manager` profile is active.
 
-To add an agent, skill or hook: put it in the matching tier, then add its
-`ln -s` line to `bootstrap-mac.sh`. Nothing is auto-discovered.
+To add an agent or skill, drop it in the matching tier (`agents/<name>.md` or
+`skills/<name>/`); bootstrap links tiers by glob. Hooks are linked by explicit name
+because `~/.claude/settings.json` references those paths.
+
+The `all-purpose` and `developer` tiers are listed in `profiles/base/ai-tiers`.
 
 Settings: the bootstrap merges only the `PreToolUse` key of
 `~/.claude/settings.json` from `ai-tools/developer/hooks/settings-hooks.json`
@@ -103,8 +125,7 @@ and backs up the previous file to `settings.json.bak`.
 
 ## Known gaps
 
-See [docs/roadmap.md](docs/roadmap.md) for concrete portability bugs and
-the proposed profile system.
+See [docs/roadmap.md](docs/roadmap.md) for what is done and what remains.
 
 ## GPG setup
 

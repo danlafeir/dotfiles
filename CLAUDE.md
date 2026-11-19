@@ -45,7 +45,8 @@ Any file named `*.local` or `*.local.*` is gitignored and installed by `link-loc
   `.zshrc` sourcing `~/.zshrc.local` or `.gitconfig` including `~/.gitconfig.local`),
   the base loads it, so the `.local` file is only symlinked. Keep that line last in the
   base so local wins.
-- A real (non-symlink) file at the destination is skipped with a warning. `.claude/`,
+- A real (non-symlink) file where a standalone `.local` would link is skipped with a
+  warning; where a merged base lands, it is moved to `<name>.pre-dotfiles`. `.claude/`,
   `.git/`, `.generated/`, `.vim/undodir`, `.vim/plugged` are not scanned.
 - `.local` files are not in git: a new machine must recreate them, then re-run
   `./link-local.sh`.
