@@ -26,15 +26,22 @@ overrides and opt-in profiles for personal versus professional use. Reviewed
 - Dotfiles-specific agent rules moved from the global `AGENTS.md` to this repo's
   `CLAUDE.md`.
 
+## Verified
+
+- 2026-11-19: `bootstrap.sh --profile base` in an `ubuntu:24.04` (arm64) container:
+  packages, oh-my-zsh, links, `doctor`, a re-run, a login `zsh`, and `tests/run.sh` all
+  pass. This found and fixed a bad step order (oh-my-zsh ran before curl existed).
+- 2026-11-19: `bootstrap.sh --profile base,python` on macOS against a throwaway `$HOME`:
+  found and fixed the oh-my-zsh `ZSH` clash, `brew bundle` upgrading regardless of
+  `--upgrade`, and `setup.sh` failing on a broken poetry.
+
 ## Unverified
 
-- The Linux adapter and the `provision-linux` CI job have not been run: there was no
-  Linux host or working container daemon when they were written. Expect first-run fixes
-  (package names in `profiles/*/apt.txt`, the oh-my-zsh installer, headless
-  `vim +PlugInstall`).
-- CI has not run at all; it needs a push.
-- `bootstrap.sh` has never been run for real since the rewrite, only against a
-  temporary `$HOME`.
+- CI has not run; it needs a push (the shellcheck job in particular, since shellcheck
+  was not available locally).
+- The `personal` and `infra` profiles have not been run end to end, and only `base`
+  has been exercised on Linux (x86 is untested).
+- `bootstrap.sh` has not been run against the real `$HOME` since the rewrite.
 
 ## Remaining
 
