@@ -9,7 +9,7 @@ install_shell_tooling() {
   installer="$(mktemp "${TMPDIR:-/tmp}/ohmyzsh.XXXXXX")"
   # Download to a file first: failure inside a $(...) argument would not stop the script.
   run curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -o "$installer"
-  run env RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh "$installer"
+  run env -u ZSH RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh "$installer"
   rm -f "$installer"
 }
 

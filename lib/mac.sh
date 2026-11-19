@@ -8,10 +8,11 @@ platform_install_packages() {
   if [ "$UPGRADE" = true ]; then
     run brew upgrade
   fi
-  local p
+  local p flags=(--no-upgrade)
+  [ "$UPGRADE" = true ] && flags=()
   for p in "${PROFILES[@]}"; do
     if [ -f "$DOTFILES_DIR/profiles/$p/brewfile" ]; then
-      run brew bundle --file "$DOTFILES_DIR/profiles/$p/brewfile"
+      run brew bundle "${flags[@]}" --file "$DOTFILES_DIR/profiles/$p/brewfile"
     fi
   done
 }
