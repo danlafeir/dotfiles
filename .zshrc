@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 
+export DOTFILES_DIR="${${(%):-%x}:A:h}"
 export PATH=$HOME/go/bin/:$PATH
 
 export ZSH="$HOME/.oh-my-zsh"
