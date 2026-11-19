@@ -67,7 +67,8 @@ For anything touching auth, identity, access control, permissions, secrets, or t
 In the dotfiles repo (`~/dev/dotfiles`), any file named `*.local` or `*.local.*` is gitignored but still bootstrapped by `link-local.sh` (run by `bootstrap-mac.sh`), and it takes precedence over its tracked base file.
 
 - Standalone (no base): symlinked into `$HOME` at the same relative path (`foo.local` -> `~/foo.local`)
-- With a base (`.zshrc` for `.zshrc.local`, `foo.json` for `foo.local.json`): the two are merged, local winning, into `.generated/<base>` (gitignored) and `~/<base>` links there. Text files are concatenated base-then-local, so later lines win (right for shell, vim, tmux, git config); `.json` is deep-merged with local values winning
+- With a base (`foo.json` for `foo.local.json`): the two are merged, local winning, into `.generated/<base>` (gitignored) and `~/<base>` links there. Text files are concatenated base-then-local, so later lines win (right for shell, vim, tmux); `.json` is deep-merged with local values winning
+- Exception: if the base file already names its `.local` file (a source/include line, e.g. `.zshrc` sources `~/.zshrc.local`, `.gitconfig` includes `~/.gitconfig.local`), the base loads it itself, so the `.local` file is only symlinked, not merged — keep that line at the end of the base so local wins
 - Merged output is generated, not live: re-run `./link-local.sh` after editing either the base or the `.local` file
 - Put machine-specific or private config in `.local` files — never in tracked files, and never commit them
 - They live only on that machine (not in git or the `install.sh` tarball); a fresh machine must recreate them, then re-run `link-local.sh`
