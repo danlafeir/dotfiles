@@ -61,7 +61,7 @@ ENABLED=$(git -C "$CWD" config --bool push-review.enabled 2>/dev/null) || ENABLE
 [ "$ENABLED" = "true" ] || exit 0
 
 if [ ! -x "$GATE_SCRIPT" ]; then
-  echo "BLOCKED by push-review-pretooluse.sh: $GATE_SCRIPT not found or not executable - run bootstrap-mac.sh" >&2
+  echo "BLOCKED by push-review-pretooluse.sh: $GATE_SCRIPT not found or not executable - run bootstrap.sh" >&2
   exit 2
 fi
 

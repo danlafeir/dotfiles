@@ -33,7 +33,7 @@ ORIGINAL="$HOOKS_DIR/pre-push.pre-push-review-original"
 OUR_SCRIPT="$HOME/.claude/hooks/push-review-git-pre-push.sh"
 
 if [ ! -e "$OUR_SCRIPT" ]; then
-  echo "error: $OUR_SCRIPT not found — run bootstrap-mac.sh first" >&2
+  echo "error: $OUR_SCRIPT not found — run bootstrap.sh first" >&2
   exit 1
 fi
 

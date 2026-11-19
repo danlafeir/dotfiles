@@ -42,7 +42,7 @@ REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 GATE_SCRIPT="$HOME/.claude/hooks/push-review-gate.sh"
 
 if [ ! -x "$GATE_SCRIPT" ]; then
-  echo "BLOCKED by pre-push (push-review gate): $GATE_SCRIPT not found or not executable - run bootstrap-mac.sh" >&2
+  echo "BLOCKED by pre-push (push-review gate): $GATE_SCRIPT not found or not executable - run bootstrap.sh" >&2
   exit 1
 fi
 

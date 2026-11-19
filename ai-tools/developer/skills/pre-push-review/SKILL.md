@@ -36,7 +36,7 @@ Parse `$ARGUMENTS`:
   ~/.claude/hooks/push-review-gate.sh range <repo-root>
   ```
 
-  (That's the deployed location `bootstrap-mac.sh` symlinks to — this skill
+  (That's the deployed location `bootstrap.sh` symlinks to — this skill
   runs inside whatever project repo you're reviewing, not inside the
   dotfiles repo, so the source-tree path `ai-tools/developer/hooks/...`
   won't exist there.)
