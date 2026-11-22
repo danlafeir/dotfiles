@@ -15,7 +15,7 @@ Project-specific AGENTS.md (or CLAUDE.md) files layer additional rules on top of
     - How the previous behavior fell short
     - Why this approach over the alternatives
   - Omit the body only when the subject says it all
-  - Finish with git trailers (`Key: value`, one per line, after a blank line) carrying machine-readable signals for agents and tooling; include only the ones that apply:
+  - Finish with [git trailers](https://git-scm.com/docs/git-interpret-trailers) (`Key: value`, one per line, after a blank line) carrying machine-readable signals for agents and tooling; include only the ones that apply:
     - `Jira: PROJ-123` — ticket this work belongs to (repeat the line for several); take it from the branch name, user, or prior commits — never invent one
     - `Fixes: <sha> ("subject")` / `Refs: <url or id>` — the bug-introducing commit, or related issues/PRs/docs
     - `Breaking: <what breaks and who is affected>` — public interface or behavior callers must adapt to
