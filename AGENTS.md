@@ -9,7 +9,11 @@ Project-specific AGENTS.md (or CLAUDE.md) files layer additional rules on top of
 - Keep commits small and focused — one logical unit per commit
 - Write commit messages the way git itself articulates them (see `git help commit` and Git's `SubmittingPatches`) — not Conventional Commits: no `feat:`/`fix(scope):` type prefixes
   - Subject: imperative mood ("Add retry to webhook handler", not "Added"/"Adds"), capitalized, no trailing period, ~50 chars, completing the sentence "If applied, this commit will ..."
-  - Blank line, then a body wrapped at ~72 chars explaining *why*: the problem or motivation, how the previous behavior fell short, and why this approach over alternatives — the diff already shows what
+  - Blank line, then a body wrapped at ~72 chars explaining *why* — the diff already shows what. Cover:
+    - The value: what the change gives users, readers, or maintainers
+    - The problem or motivation
+    - How the previous behavior fell short
+    - Why this approach over the alternatives
   - Omit the body only when the subject says it all
   - Finish with git trailers (`Key: value`, one per line, after a blank line) carrying machine-readable signals for agents and tooling; include only the ones that apply:
     - `Jira: PROJ-123` — ticket this work belongs to (repeat the line for several); take it from the branch name, user, or prior commits — never invent one
