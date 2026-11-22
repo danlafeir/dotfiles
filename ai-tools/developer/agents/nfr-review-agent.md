@@ -46,7 +46,7 @@ Also report **NFR file problems**: an NFR whose "how to check" refers to a
 path or tool that no longer exists, or a change that introduces a new
 concern the file doesn't cover (a first public endpoint, the first stored
 PII, a first scheduled job). Label these `[nfr-file]` and keep them to
-suggestions for the user to take to `/nfr-setup`; don't rewrite the file.
+suggestions for the user to apply by editing `docs/nfrs.md`; don't rewrite the file.
 
 ## Output format
 

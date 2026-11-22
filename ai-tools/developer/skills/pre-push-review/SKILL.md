@@ -14,7 +14,8 @@ whether the push-review gate should let the push through. The agents' default
 outcome is "nothing found"; the walkthrough is never skipped — the gate only
 passes once you've been through every commit in the range.
 
-This skill never writes to the repo. If a finding or a flagged commit needs a
+This skill never changes code. Its one write is the first-run NFR file
+(Step 2), which it commits on its own so the walkthrough covers it. If a finding or a flagged commit needs a
 code change, you make that change and re-run this skill afterward — the
 gate's record is keyed to the exact diff and commit list, so a changed diff
 or rewritten commits always need a fresh pass and a fresh walkthrough.
@@ -68,6 +69,74 @@ disagree:
 - **`deployed`** — at least one path may ship (source, dependency manifests,
   deploy/infra config, or anything the classifier doesn't recognise). Continue: this review is required.
 
+**First run — declare the repo's non-functional requirements.** Only reached
+for a `deployed` push, so a documentation-only (or test/build-only) push never
+triggers it and the config never turns a light push into a reviewed one. If
+`docs/nfrs.md` exists, or `git config --get push-review.nfrs` is `false`
+(the user opted this repo out), skip this block. Otherwise this is the repo's
+first review: work out which NFRs matter, and save them so every later review
+checks against them.
+
+1. **Inspect the repo.** Read the manifests and layout (`package.json`,
+   `pyproject.toml`, `go.mod`, `Dockerfile`, `*.tf`, framework configs), the
+   README, CI and deploy config, and `git log --oneline -20`. Decide what it
+   is (often several): public website, HTTP API, internal service, data
+   pipeline or migrations, CLI or library, infrastructure-as-code, app,
+   tooling. Note concrete facts to cite: where URLs are defined, where logs
+   and metrics go, where secrets are read, what runs on a schedule, how it is
+   deployed.
+2. **Propose candidates** from this menu, only those the evidence supports
+   (roughly eight at most), each with a one-line reason citing the file that
+   told you:
+
+   | NFR | Applies when | Typical risk in a diff |
+   |---|---|---|
+   | Availability and rollback | anything deployed | change that cannot be rolled back, a deploy-order dependency, a new single point of failure |
+   | URL and API stability | public site or API | a route renamed or removed without a redirect, a response field removed, a changed status code |
+   | SEO | public website | lost title/description, canonical or sitemap changes, noindex, links to moved pages |
+   | Security and privacy | auth, user data, secrets, third-party calls | new PII stored or logged, a widened permission, a new outbound domain, a token in a URL |
+   | Performance | request paths, queries, bundles | an unbounded query, a heavier page or bundle, a new blocking call on a hot path |
+   | Reliability of dependencies | external calls, queues, webhooks | no timeout, unbounded retry, a non-idempotent handler |
+   | Data integrity | schemas, migrations, pipelines | a destructive migration, no backfill, a lossy transform |
+   | Observability | services, jobs | a new failure path with no log or metric, an alert that will now fire or go silent |
+   | Accessibility | UI | missing labels or alt text, keyboard traps, contrast |
+   | Compatibility | libraries, CLIs, browsers, OSes | a breaking public interface, a dropped platform or version |
+   | Cost | cloud resources, paid APIs | a new always-on resource, an uncapped call to a metered API |
+   | Maintainability | any | undocumented operational steps, a new manual runbook step |
+
+3. **Confirm.** AskUserQuestion (multiSelect, up to 4 options per question,
+   several questions in one call): "Which of these NFRs should every push to
+   this repo be checked against?" Selected = on the list. Include an option
+   in the first question, "None — don't ask again for this repo", which runs
+   `git config push-review.nfrs false` and skips the rest of this block. Then
+   ask once whether any repo-specific requirement is missing and whether any
+   has a concrete target ("p95 under 300ms", "no URL change without a 301").
+   A target the user gives goes in verbatim; never invent one.
+4. **Write `docs/nfrs.md`** (create `docs/` if needed), one `##` section per
+   NFR in exactly this shape:
+
+   ```markdown
+   # Non-functional requirements
+
+   Checked by `/pre-push-review` (via `nfr-review-agent`) on every push that
+   changes deployed code. Edit this file to revise the list.
+
+   ## URL stability
+
+   - **Why it matters here:** <one line, repo-specific>
+   - **Target:** <the user's number or rule, or "none declared">
+   - **How to check a diff:** <real paths, commands or signals from this repo>
+   - **Out of scope:** <what the reviewer should not flag>
+   ```
+
+   No generic advice: "How to check" must name things that exist in this repo.
+5. **Commit it alone** per the global commit conventions (subject like
+   "Declare non-functional requirements for pre-push review", body with the
+   value, the docs change and the non-functional impact, `Tested: not run`).
+   Then re-run `push-review-gate.sh range` and re-list the commits: the new
+   commit is part of what is about to be pushed, so Step 5 must walk it and
+   `nfr-review-agent` runs against the file this run just wrote. Do not push.
+
 Get the changed files with `git diff --name-only --diff-filter=ACMR <range>`.
 
 **Required agents** — always run for a `deployed` range:
@@ -80,14 +149,13 @@ Get the changed files with `git diff --name-only --diff-filter=ACMR <range>`.
   and applying them is the user's call afterward (or via `document-changes`).
 - **`design-review-agent`** — code design and correctness.
 
-**Per-repo agent** — runs automatically when the repo declares its
-non-functional requirements, i.e. `docs/nfrs.md` exists at the repo root:
+**Per-repo agent** — runs whenever `docs/nfrs.md` exists at the repo root,
+including right after the first-run setup above:
 
 - **`nfr-review-agent`** — checks the range against that file (availability,
   URL stability, SEO, security/privacy, performance, and whatever else the
-  repo listed). If the file is absent, skip the agent and say in the final
-  report that `/nfr-setup` would create one; don't offer it more than once
-  per run.
+  repo listed). If the file is absent (the user opted out), skip the agent
+  and say so in the final report.
 
 **Optional agents** — not part of the required review. Run one only when
 `$ARGUMENTS` asks for it (`performance`, `db`) or the user says so; otherwise
