@@ -80,6 +80,15 @@ Get the changed files with `git diff --name-only --diff-filter=ACMR <range>`.
   and applying them is the user's call afterward (or via `document-changes`).
 - **`design-review-agent`** — code design and correctness.
 
+**Per-repo agent** — runs automatically when the repo declares its
+non-functional requirements, i.e. `docs/nfrs.md` exists at the repo root:
+
+- **`nfr-review-agent`** — checks the range against that file (availability,
+  URL stability, SEO, security/privacy, performance, and whatever else the
+  repo listed). If the file is absent, skip the agent and say in the final
+  report that `/nfr-setup` would create one; don't offer it more than once
+  per run.
+
 **Optional agents** — not part of the required review. Run one only when
 `$ARGUMENTS` asks for it (`performance`, `db`) or the user says so; otherwise
 skip it and say so in the report. Use these heuristics to *suggest* it in the
@@ -98,7 +107,8 @@ which you'd suggest running) rather than silently omitting them.
 ## Step 3 — spin up the review agents
 
 Call the Agent tool once per agent selected in Step 2 (the three required
-ones, plus any optional ones that were requested), **in a single message
+ones, `nfr-review-agent` when `docs/nfrs.md` exists, plus any optional ones
+that were requested), **in a single message
 with multiple tool calls** (they're independent, read-only investigations —
 same pattern as running several Explore agents in parallel). Give each one
 the repo root (`git rev-parse --show-toplevel`) and the commit list from
@@ -239,7 +249,7 @@ in the repo:
 ## Step 7 — wrap up
 
 Report: whether the push was classified `light` (and so skipped) or
-`deployed`, which agents ran (and which optional ones were skipped, and why),
+`deployed`, which agents ran (and whether the repo has `docs/nfrs.md`) (and which optional ones were skipped, and why),
 what each found, what the user chose to fix vs. acknowledge, how many
 commits were approved and which were flagged (or that the walkthrough was
 stopped early), and whether a passing marker was written. If the push is

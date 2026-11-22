@@ -107,10 +107,16 @@ bootstrap:
   guard hook (blocks reading or writing real secrets via secret-store
   CLIs or credential files).
 - `developer/`: the review agents (security, design, documentation,
-  performance, db-integrity, dependency audit), the `pre-push-review`,
-  `pre-push-audit` and `document-changes` skills, the push-review gate
-  (a Claude Code hook plus a per-repo git `pre-push` hook), and
-  `templates/` for per-project `AGENTS.md`.
+  performance, db-integrity, NFR, dependency audit), the `pre-push-review`,
+  `pre-push-audit`, `document-changes` and `nfr-setup` skills, the
+  push-review gate (a Claude Code hook plus a per-repo git `pre-push` hook),
+  and `templates/` for per-project `AGENTS.md`.
+
+Per repo, run `/nfr-setup` once: it inspects the repo, proposes the
+non-functional requirements worth watching (availability, URL stability,
+SEO, security/privacy, performance, ...), and writes your choices to a
+committed `docs/nfrs.md`. From then on `/pre-push-review` also runs
+`nfr-review-agent` against that file. Repos without the file skip it.
 - `manager/`: reserved, empty. Linked only when the `manager` profile is active.
 
 To add an agent or skill, drop it in the matching tier (`agents/<name>.md` or
